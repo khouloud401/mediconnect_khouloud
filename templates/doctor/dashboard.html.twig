@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+{% block title %}Dashboard Médecin - MediConnect{% endblock %}
+{% block body %}
+<h1><i class="bi bi-speedometer2"></i> Dashboard Médecin</h1>
+<div class="row g-4 mt-3">
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h3>{{ pendingAppointments|length }}</h3>
+                <p>RDV en attente</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h3>{{ upcomingAppointments|length }}</h3>
+                <p>RDV à venir</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h3>{{ totalConsultations }}</h3>
+                <p>Consultations</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h3>{{ averageRating }}/5</h3>
+                <p>Note moyenne</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Rendez-vous en attente</h5>
+                {% for appointment in pendingAppointments %}
+                <div class="border-bottom py-2">
+                    <strong>{{ appointment.patient.fullName }}</strong><br>
+                    <small>{{ appointment.dateTime|date('d/m/Y à H:i') }}</small><br>
+                    <a href="{{ path('doctor_accept_appointment', {id: appointment.id}) }}" class="btn btn-sm btn-success">Accepter</a>
+                    <a href="{{ path('doctor_refuse_appointment', {id: appointment.id}) }}" class="btn btn-sm btn-danger">Refuser</a>
+                </div>
+                {% else %}
+                <p class="text-muted">Aucun rendez-vous en attente.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Actions Rapides</h5>
+                <div class="d-grid gap-2">
+                    <a href="{{ path('doctor_appointments') }}" class="btn btn-outline-primary">Tous mes rendez-vous</a>
+                    <a href="{{ path('doctor_patients') }}" class="btn btn-outline-success">Mes patients</a>
+                    <a href="{{ path('doctor_statistics') }}" class="btn btn-outline-info">Statistiques</a>
+                    <a href="{{ path('doctor_profile') }}" class="btn btn-outline-secondary">Mon profil</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

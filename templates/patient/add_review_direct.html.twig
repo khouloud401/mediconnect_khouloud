@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Donner mon avis{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Donner mon avis sur Dr {{ doctor.fullName }}</h1>
+
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button class="btn btn-primary mt-3">Envoyer mon avis</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

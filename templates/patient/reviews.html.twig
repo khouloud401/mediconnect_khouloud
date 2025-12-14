@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes avis{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Mes avis sur les médecins</h1>
+
+        {% if reviews|length > 0 %}
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Médecin</th>
+                    <th>Note</th>
+                    <th>Commentaire</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for review in reviews %}
+                    <tr>
+                        <td>{{ review.doctor.fullName }}</td>
+                        <td>{{ review.rating }}/5</td>
+                        <td>{{ review.comment }}</td>
+                        <td>{{ review.createdAt|date('d/m/Y H:i') }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            {{ knp_pagination_render(reviews) }}
+        {% else %}
+            <p>Vous n'avez pas encore laissé d'avis.</p>
+        {% endif %}
+    </div>
+{% endblock %}

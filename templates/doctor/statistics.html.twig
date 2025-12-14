@@ -1,0 +1,51 @@
+{# templates/doctor/statistics.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Mes statistiques</h1>
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card text-center mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Total rendez-vous</h5>
+                        <p class="card-text display-6">{{ totalAppointments }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-center mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Terminés</h5>
+                        <p class="card-text display-6">{{ completedAppointments }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-center mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">En attente</h5>
+                        <p class="card-text display-6">{{ pendingAppointments }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-center mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Note moyenne</h5>
+                        <p class="card-text display-6">
+                            {{ averageRating is not null ? averageRating|number_format(1) : '-' }}/5
+                        </p>
+                        <small>{{ totalReviews }} avis</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

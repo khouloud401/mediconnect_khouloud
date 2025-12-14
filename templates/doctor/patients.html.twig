@@ -1,0 +1,33 @@
+{# templates/doctor/patients.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes patients{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Mes patients</h1>
+
+        {% if patients|length > 0 %}
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Téléphone</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for patient in patients %}
+                    <tr>
+                        <td>{{ patient.fullName }}</td>
+                        <td>{{ patient.email }}</td>
+                        <td>{{ patient.phone ?? '-' }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Aucun patient trouvé pour le moment.</p>
+        {% endif %}
+    </div>
+{% endblock %}

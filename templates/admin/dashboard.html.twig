@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+{% block title %}Dashboard Admin - MediConnect{% endblock %}
+{% block body %}
+<h1><i class="bi bi-speedometer2"></i> Dashboard Administrateur</h1>
+<div class="row g-4 mt-3">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h3>{{ totalDoctors }}</h3>
+                <p>Médecins</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h3>{{ totalPatients }}</h3>
+                <p>Patients</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h3>{{ totalAppointments }}</h3>
+                <p>Rendez-vous</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h3>{{ pendingReviews }}</h3>
+                <p>Avis en attente</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Actions Rapides</h5>
+                <div class="btn-group" role="group">
+                    <a href="{{ path('admin_doctors') }}" class="btn btn-outline-primary">Gérer les médecins</a>
+                    <a href="{{ path('admin_patients') }}" class="btn btn-outline-success">Gérer les patients</a>
+                    <a href="{{ path('admin_specialties') }}" class="btn btn-outline-info">Gérer les spécialités</a>
+                    <a href="{{ path('admin_appointments') }}" class="btn btn-outline-warning">Gérer les rendez-vous</a>
+                    <a href="{{ path('admin_reviews') }}" class="btn btn-outline-danger">Gérer les avis</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

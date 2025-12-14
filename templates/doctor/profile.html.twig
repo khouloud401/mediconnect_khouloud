@@ -1,0 +1,26 @@
+{# templates/doctor/profile.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Mon profil</h1>
+
+        {# messages flash de succès #}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {# rendu automatique de tous les champs du formulaire #}
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+
+        <button class="btn btn-primary mt-3">
+            Enregistrer
+        </button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

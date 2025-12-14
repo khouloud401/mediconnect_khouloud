@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+{% block title %}Accueil - MediConnect{% endblock %}
+{% block body %}
+<div class="jumbotron bg-light p-5 rounded-3 mb-4">
+    <h1 class="display-4">Bienvenue sur MediConnect</h1>
+    <p class="lead">Trouvez et réservez un rendez-vous avec les meilleurs médecins près de chez vous</p>
+    <hr class="my-4">
+    <a class="btn btn-primary btn-lg" href="{{ path('patient_search_doctors') }}" role="button">
+        <i class="bi bi-search"></i> Rechercher un médecin
+    </a>
+</div>
+
+<h2 class="mb-4">Spécialités médicales</h2>
+<div class="row g-3 mb-5">
+    {% for specialty in specialties|slice(0, 6) %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ specialty.nom }}</h5>
+                <p class="card-text">{{ specialty.description|slice(0, 100) }}...</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<h2 class="mb-4">Médecins les mieux notés</h2>
+<div class="row g-3">
+    {% for doctor in topDoctors %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Dr. {{ doctor.fullName }}</h5>
+                <p class="card-text">
+                    <strong>{{ doctor.specialty.nom }}</strong><br>
+                    <i class="bi bi-geo-alt"></i> {{ doctor.ville }}<br>
+                    <i class="bi bi-star-fill text-warning"></i> {{ doctor.averageRating }}/5
+                </p>
+                <a href="{{ path('patient_doctor_profile', {id: doctor.id}) }}" class="btn btn-sm btn-outline-primary">Voir le profil</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

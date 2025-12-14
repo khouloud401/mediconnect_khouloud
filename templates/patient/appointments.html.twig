@@ -1,0 +1,53 @@
+{# templates/patient/appointments.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes rendez-vous{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Mes rendez-vous</h1>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% if appointments|length > 0 %}
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Médecin</th>
+                    <th>Date</th>
+                    <th>Heure</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for appointment in appointments %}
+                    <tr>
+                        <td>{{ appointment.doctor.fullName }}</td>
+                        <td>{{ appointment.dateTime|date('d/m/Y') }}</td>
+                        <td>{{ appointment.dateTime|date('H:i') }}</td>
+                        <td>{{ appointment.status }}</td>
+                        <td>
+                            {% if appointment.status == 'completed' %}
+                                <a href="{{ path('patient_add_review', {id: appointment.id}) }}" class="btn btn-sm btn-primary">
+                                    Laisser un avis
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="navigation">
+                {{ knp_pagination_render(appointments) }}
+            </div>
+        {% else %}
+            <p>Aucun rendez-vous pour le moment.</p>
+        {% endif %}
+    </div>
+{% endblock %}

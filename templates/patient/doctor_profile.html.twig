@@ -1,0 +1,33 @@
+{# templates/patient/doctor_profile.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil du médecin{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Dr {{ doctor.fullName }}</h1>
+
+        <div class="row">
+            <div class="col-md-8">
+                <h4>Informations</h4>
+                <p><strong>Spécialité :</strong> {{ doctor.specialty.name ?? 'Non renseignée' }}</p>
+                <p><strong>Ville :</strong> {{ doctor.city ?? 'Non renseignée' }}</p>
+                <p><strong>Adresse :</strong> {{ doctor.address ?? 'Non renseignée' }}</p>
+                <p><strong>Description :</strong><br>
+                    {{ doctor.description ?? 'Aucune description pour le moment.' }}
+                </p>
+
+                <a href="{{ path('patient_book_appointment', {id: doctor.id}) }}" class="btn btn-primary">
+                    Prendre rendez-vous
+                </a>
+            </div>
+
+            <div class="col-md-4">
+                <h4>Note moyenne</h4>
+                <p>
+                    {{ doctor.averageRating is not null ? doctor.averageRating|number_format(1) ~ '/5' : 'Aucune note' }}
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

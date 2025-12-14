@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes ordonnances{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Mes ordonnances</h1>
+
+        {% if prescriptions|length > 0 %}
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Médecin</th>
+                    <th>Date</th>
+                    <th>Médicaments</th>
+                    <th>Instructions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for prescription in prescriptions %}
+                    <tr>
+                        <td>{{ prescription.appointment.doctor.fullName }}</td>
+                        <td>{{ prescription.createdAt|date('d/m/Y H:i') }}</td>
+                        <td>{{ prescription.medicines }}</td>
+                        <td>{{ prescription.instructions }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            {{ knp_pagination_render(prescriptions) }}
+        {% else %}
+            <p>Vous n'avez pas encore d'ordonnance.</p>
+        {% endif %}
+    </div>
+{% endblock %}

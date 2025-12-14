@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+{% block title %}Mon Espace Patient - MediConnect{% endblock %}
+{% block body %}
+<h1><i class="bi bi-speedometer2"></i> Mon Espace Patient</h1>
+<div class="row g-4 mt-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-calendar-check"></i> Mes Prochains Rendez-vous</h5>
+                {% if appointments is empty %}
+                    <p class="text-muted">Aucun rendez-vous pour le moment.</p>
+                {% else %}
+                    <div class="list-group">
+                        {% for appointment in appointments %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>Dr. {{ appointment.doctor.fullName }}</strong><br>
+                                    <small>{{ appointment.dateTime|date('d/m/Y à H:i') }}</small><br>
+                                    <span class="badge bg-{{ appointment.statusBadgeClass }}">{{ appointment.statusLabel }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <a href="{{ path('patient_appointments') }}" class="btn btn-primary mt-3">Voir tous mes rendez-vous</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-search"></i> Actions Rapides</h5>
+                <div class="d-grid gap-2">
+                    <a href="{{ path('patient_search_doctors') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-search"></i> Rechercher un médecin
+                    </a>
+                    <a href="{{ path('patient_appointments') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-calendar"></i> Mes rendez-vous
+                    </a>
+
+
+                    {# Mes ordonnances #}
+                    <a href="{{ path('patient_prescriptions') }}" class="btn btn-outline-secondary btn-lg w-100 mb-2">
+                        <i class="bi bi-file-earmark-medical"></i> Mes ordonnances
+                    </a>
+
+                    {# Mes avis #}
+                    <a href="{{ path('patient_reviews') }}" class="btn btn-outline-secondary btn-lg w-100">
+                        <i class="bi bi-star"></i> Mes avis
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
