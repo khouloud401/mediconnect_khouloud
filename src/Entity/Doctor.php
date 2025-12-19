@@ -13,7 +13,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 #[Vich\Uploadable]
 class Doctor extends User
 {
-    #[ORM\ManyToOne(inversedBy: 'doctors')]
+    #[ORM\ManyToOne(targetEntity: Specialty::class, inversedBy: 'doctors')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Specialty $specialty = null;
 
@@ -52,17 +52,19 @@ class Doctor extends User
         $this->setRoles(['ROLE_DOCTOR']);
     }
 
+    // --------------------- Specialty ---------------------
     public function getSpecialty(): ?Specialty
     {
         return $this->specialty;
     }
 
-    public function setSpecialty(?Specialty $specialty): static
+    public function setSpecialty(Specialty $specialty): static
     {
         $this->specialty = $specialty;
         return $this;
     }
 
+    // --------------------- Ville ---------------------
     public function getVille(): ?string
     {
         return $this->ville;
@@ -74,6 +76,7 @@ class Doctor extends User
         return $this;
     }
 
+    // --------------------- Description ---------------------
     public function getDescription(): ?string
     {
         return $this->description;
@@ -85,6 +88,7 @@ class Doctor extends User
         return $this;
     }
 
+    // --------------------- Experience ---------------------
     public function getExperience(): ?string
     {
         return $this->experience;
@@ -96,6 +100,7 @@ class Doctor extends User
         return $this;
     }
 
+    // --------------------- Horaires ---------------------
     public function getHoraires(): ?string
     {
         return $this->horaires;
@@ -107,6 +112,7 @@ class Doctor extends User
         return $this;
     }
 
+    // --------------------- Photo ---------------------
     public function getPhoto(): ?string
     {
         return $this->photo;
@@ -118,18 +124,17 @@ class Doctor extends User
         return $this;
     }
 
-    public function setPhotoFile(?File $photoFile = null): void
-    {
-        $this->photoFile = $photoFile;
-
-        if (null !== $photoFile) {
-            $this->updatedAt = new \DateTimeImmutable();
-        }
-    }
-
     public function getPhotoFile(): ?File
     {
         return $this->photoFile;
+    }
+
+    public function setPhotoFile(?File $photoFile = null): void
+    {
+        $this->photoFile = $photoFile;
+        if ($photoFile !== null) {
+            $this->updatedAt = new \DateTimeImmutable();
+        }
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable
@@ -143,6 +148,7 @@ class Doctor extends User
         return $this;
     }
 
+    // --------------------- Appointments ---------------------
     /**
      * @return Collection<int, Appointment>
      */
@@ -170,6 +176,7 @@ class Doctor extends User
         return $this;
     }
 
+    // --------------------- Reviews ---------------------
     /**
      * @return Collection<int, Review>
      */
@@ -197,10 +204,12 @@ class Doctor extends User
         return $this;
     }
 
+    // --------------------- Average Rating ---------------------
     public function getAverageRating(): float
     {
-        if ($this->reviews->isEmpty()) {
-            return 0.0;
+        $count = $this->reviews->count();
+        if ($count === 0) {
+            return 0.0; // aucun avis
         }
 
         $total = 0;
@@ -208,13 +217,12 @@ class Doctor extends User
             $total += $review->getRating();
         }
 
-        return round($total / $this->reviews->count(), 1);
+        return round($total / $count, 1);
     }
 
+    // --------------------- Total Consultations ---------------------
     public function getTotalConsultations(): int
     {
-        return $this->appointments->filter(function(Appointment $appointment) {
-            return $appointment->getStatus() === 'completed';
-        })->count();
+        return $this->appointments->filter(fn(Appointment $a) => $a->getStatus() === 'completed')->count();
     }
 }

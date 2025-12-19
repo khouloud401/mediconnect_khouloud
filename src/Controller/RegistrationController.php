@@ -80,4 +80,36 @@ class RegistrationController extends AbstractController
             'registrationForm' => $form->createView(),
         ]);
     }
+    #[Route('/register/nurse', name: 'app_register_nurse')]
+    public function registerNurse(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $nurse = new Nurse();
+        $form = $this->createForm(RegistrationNurseType::class, $nurse);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $nurse->setPassword(
+                $passwordHasher->hashPassword(
+                    $nurse,
+                    $form->get('plainPassword')->getData()
+                )
+            );
+
+            $entityManager->persist($nurse);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre compte infirmier a été créé avec succès !');
+            return $this->redirectToRoute('app_login');
+        }
+
+        return $this->render('registration/register_nurse.html.twig', [
+            'registrationForm' => $form->createView(),
+        ]);
+    }
+
+
 }
+

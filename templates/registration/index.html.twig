@@ -1,31 +1,53 @@
 {% extends 'base.html.twig' %}
 {% block title %}Inscription - MediConnect{% endblock %}
+
 {% block body %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <h2 class="text-center mb-4">Créer un compte</h2>
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="card h-100 shadow">
-                    <div class="card-body text-center p-5">
-                        <i class="bi bi-person-circle display-1 text-primary"></i>
-                        <h3 class="mt-3">Patient</h3>
-                        <p>Recherchez des médecins et prenez rendez-vous en ligne</p>
-                        <a href="{{ path('app_register_patient') }}" class="btn btn-primary">S'inscrire comme patient</a>
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <h2 class="text-center mb-4">Créer un compte</h2>
+            <div class="row g-4">
+                {# Patient #}
+                <div class="col-md-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-body text-center p-5">
+                            <i class="bi bi-person-circle display-1 text-primary"></i>
+                            <h3 class="mt-3">Patient</h3>
+                            <p>Recherchez des médecins et prenez rendez-vous en ligne</p>
+                            <a href="{{ path('app_register_patient') }}" class="btn btn-primary">
+                                S'inscrire comme patient
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card h-100 shadow">
-                    <div class="card-body text-center p-5">
-                        <i class="bi bi-heart-pulse display-1 text-success"></i>
-                        <h3 class="mt-3">Médecin</h3>
-                        <p>Gérez vos rendez-vous et vos patients en ligne</p>
-                        <a href="{{ path('app_register_doctor') }}" class="btn btn-success">S'inscrire comme médecin</a>
+
+                {# Médecin #}
+                <div class="col-md-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-body text-center p-5">
+                            <i class="bi bi-heart-pulse display-1 text-success"></i>
+                            <h3 class="mt-3">Médecin</h3>
+                            <p>Gérez vos rendez-vous et vos patients en ligne</p>
+                            <a href="{{ path('app_register_doctor') }}" class="btn btn-success">
+                                S'inscrire comme médecin
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                {# Infirmier #}
+                <div class="col-md-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-body text-center p-5">
+                            <i class="bi bi-hospital display-1 text-info"></i>
+                            <h3 class="mt-3">Infirmier</h3>
+                            <p>Gérez vos soins et vos patients en ligne</p>
+                            <a href="{{ path('app_register_nurse') }}" class="btn btn-info">
+                                S'inscrire comme infirmier
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

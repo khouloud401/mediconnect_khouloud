@@ -26,7 +26,7 @@ class DoctorController extends AbstractController
         ReviewRepository $reviewRepository
     ): Response {
         $doctor = $this->getUser();
-        
+
         $pendingAppointments = $appointmentRepository->findBy(
             ['doctor' => $doctor, 'status' => 'pending'],
             ['dateTime' => 'ASC'],
@@ -86,7 +86,7 @@ class DoctorController extends AbstractController
         Request $request
     ): Response {
         $doctor = $this->getUser();
-        
+
         $query = $appointmentRepository->createQueryBuilder('a')
             ->where('a.doctor = :doctor')
             ->setParameter('doctor', $doctor)
@@ -146,33 +146,51 @@ class DoctorController extends AbstractController
         return $this->redirectToRoute('doctor_appointments');
     }
 
-    #[Route('/appointment/{id}/prescription', name: 'doctor_create_prescription')]
-    public function createPrescription(
-        Appointment $appointment,
-        Request $request,
-        EntityManagerInterface $entityManager
+    // ✅ Unified prescriptions page (list + create)
+    #[Route('/prescriptions/{appointmentId?}', name: 'doctor_prescriptions')]
+    public function prescriptions(
+        ?int $appointmentId = null,
+        EntityManagerInterface $entityManager,
+        Request $request
     ): Response {
-        if ($appointment->getDoctor() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+        $doctor = $this->getUser();
+        $form = null;
+
+        if ($appointmentId) {
+            $appointment = $entityManager->getRepository(Appointment::class)->find($appointmentId);
+
+            if (!$appointment || $appointment->getDoctor() !== $doctor) {
+                throw $this->createAccessDeniedException();
+            }
+
+            $prescription = new Prescription();
+            $prescription->setAppointment($appointment);
+
+            $form = $this->createForm(PrescriptionType::class, $prescription);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager->persist($prescription);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Ordonnance créée avec succès !');
+                return $this->redirectToRoute('doctor_prescriptions');
+            }
         }
 
-        $prescription = new Prescription();
-        $prescription->setAppointment($appointment);
+        // List all prescriptions of this doctor
+        $prescriptions = $entityManager->getRepository(Prescription::class)
+            ->createQueryBuilder('p')
+            ->join('p.appointment', 'a')
+            ->where('a.doctor = :doctor')
+            ->setParameter('doctor', $doctor)
+            ->orderBy('p.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
 
-        $form = $this->createForm(PrescriptionType::class, $prescription);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($prescription);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Ordonnance créée avec succès !');
-            return $this->redirectToRoute('doctor_appointments');
-        }
-
-        return $this->render('doctor/create_prescription.html.twig', [
-            'form' => $form->createView(),
-            'appointment' => $appointment,
+        return $this->render('doctor/prescriptions.html.twig', [
+            'form' => $form ? $form->createView() : null,
+            'prescriptions' => $prescriptions,
         ]);
     }
 
@@ -180,9 +198,8 @@ class DoctorController extends AbstractController
     public function patients(): Response
     {
         $doctor = $this->getUser();
-        
-        // Get unique patients from completed appointments
-        $appointments = $doctor->getAppointments()->filter(function($appointment) {
+
+        $appointments = $doctor->getAppointments()->filter(function ($appointment) {
             return $appointment->getStatus() === 'completed';
         });
 

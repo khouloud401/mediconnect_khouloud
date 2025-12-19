@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Prescriptions - MediConnect{% endblock %}
+
+{% block body %}
+    <h1><i class="bi bi-file-medical"></i> Mes Prescriptions</h1>
+
+    <div class="row mt-4">
+        <!-- Create Prescription Form -->
+        {% if form is not null %}
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            Rédiger une ordonnance pour {{ form.vars.data.appointment.patient.fullName }}
+                        </h5>
+                        {{ form_start(form) }}
+                        {{ form_row(form.content) }}
+                        {{ form_row(form.medications) }}
+                        {{ form_row(form.instructions) }}
+                        <button class="btn btn-primary mt-2">Créer l'ordonnance</button>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- List Prescriptions -->
+        <div class="{% if form is not null %}col-md-6{% else %}col-md-12{% endif %}">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Mes ordonnances</h5>
+                    {% if prescriptions is not empty %}
+                        <ul class="list-group">
+                            {% for prescription in prescriptions %}
+                                <li class="list-group-item">
+                                    <strong>Patient:</strong> {{ prescription.appointment.patient.fullName }}<br>
+                                    <strong>Date:</strong> {{ prescription.createdAt|date('d/m/Y H:i') }}<br>
+                                    <strong>Contenu:</strong> {{ prescription.content }}<br>
+                                    {% if prescription.medications %}
+                                        <strong>Médicaments:</strong> {{ prescription.medications }}<br>
+                                    {% endif %}
+                                    {% if prescription.instructions %}
+                                        <strong>Instructions:</strong> {{ prescription.instructions }}
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">Vous n'avez aucune ordonnance pour le moment.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

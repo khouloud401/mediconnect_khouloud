@@ -1,0 +1,105 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails Infirmier{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 700px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: none;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 20px;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #667eea;
+        }
+        .btn-custom {
+            border-radius: 25px;
+            padding: 10px 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="mb-0"><i class="fas fa-user-nurse"></i> Détails de l'Infirmier</h1>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <td class="info-label">ID:</td>
+                        <td>{{ nurse.id }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">Nom:</td>
+                        <td><strong>{{ nurse.name }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">Email:</td>
+                        <td>{{ nurse.email }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">Téléphone:</td>
+                        <td>{{ nurse.phone }}</td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">Équipe:</td>
+                        <td>
+                            {% if nurse.shift == 'morning' %}
+                                <span class="badge bg-warning text-dark">Matin (8h-16h)</span>
+                            {% elseif nurse.shift == 'evening' %}
+                                <span class="badge bg-warning">Soir (16h-00h)</span>
+                            {% elseif nurse.shift == 'night' %}
+                                <span class="badge bg-primary">Nuit (00h-8h)</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Non défini</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">Numéro d'équipe:</td>
+                        <td>
+                            {% if nurse.teamNumber %}
+                                <span class="badge bg-info">Équipe {{ nurse.teamNumber }}</span>
+                            {% else %}
+                                Non défini
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{{ path('app_nurse_index') }}" class="btn btn-secondary btn-custom">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </a>
+                    <a href="{{ path('app_nurse_edit', {'id': nurse.id}) }}" class="btn btn-warning btn-custom">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
