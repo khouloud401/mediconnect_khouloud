@@ -1,30 +1,85 @@
 {% extends 'base.html.twig' %}
+
 {% block title %}Inscription Médecin - MediConnect{% endblock %}
+
 {% block body %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-body p-5">
-                <h2 class="text-center mb-4">Inscription Médecin</h2>
-                {{ form_start(registrationForm) }}
-                <div class="row">
-                    <div class="col-md-6 mb-3">{{ form_row(registrationForm.nom) }}</div>
-                    <div class="col-md-6 mb-3">{{ form_row(registrationForm.prenom) }}</div>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <h2 class="text-center mb-4">Inscription Médecin</h2>
+
+                        {{ form_start(registrationForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(registrationForm.nom) }}
+                                {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(registrationForm.prenom) }}
+                                {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(registrationForm.email) }}
+                                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(registrationForm.phone) }}
+                                {{ form_widget(registrationForm.phone, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                {{ form_label(registrationForm.ville) }}
+                                {{ form_widget(registrationForm.ville, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form_label(registrationForm.specialty) }}
+                                {{ form_widget(registrationForm.specialty, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form_label(registrationForm.diploma) }}
+                                {{ form_widget(registrationForm.diploma, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.experience) }}
+                            {{ form_widget(registrationForm.experience, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.description) }}
+                            {{ form_widget(registrationForm.description, {'attr': {'class': 'form-control', 'rows': '3'}}) }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(registrationForm.plainPassword.first) }}
+                                {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(registrationForm.plainPassword.second) }}
+                                {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 mt-4">S'inscrire</button>
+
+                        {{ form_end(registrationForm) }}
+
+                        <div class="text-center mt-3">
+                            <p>Déjà un compte ? <a href="{{ path('app_login') }}">Connectez-vous</a></p>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">{{ form_row(registrationForm.email) }}</div>
-                <div class="mb-3">{{ form_row(registrationForm.phone) }}</div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">{{ form_row(registrationForm.ville) }}</div>
-                    <div class="col-md-6 mb-3">{{ form_row(registrationForm.specialty) }}</div>
-                </div>
-                <div class="mb-3">{{ form_row(registrationForm.experience) }}</div>
-                <div class="mb-3">{{ form_row(registrationForm.description) }}</div>
-                <div class="mb-3">{{ form_row(registrationForm.plainPassword.first) }}</div>
-                <div class="mb-3">{{ form_row(registrationForm.plainPassword.second) }}</div>
-                <button type="submit" class="btn btn-success w-100">S'inscrire</button>
-                {{ form_end(registrationForm) }}
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

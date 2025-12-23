@@ -147,6 +147,36 @@ class Doctor extends User
         $this->updatedAt = $updatedAt;
         return $this;
     }
+    // ... après les propriétés de la photo ...
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $diplomaFilename = null;
+
+    // Ce champ sert pour le formulaire (VichUploader)
+    #[Vich\UploadableField(mapping: 'doctor_diplomas', fileNameProperty: 'diplomaFilename')]
+    private ?File $diplomaFile = null;
+
+    // --- Ajoute les méthodes (Getters et Setters) ---
+
+    public function getDiplomaFilename(): ?string {
+        return $this->diplomaFilename;
+    }
+
+    public function setDiplomaFilename(?string $diplomaFilename): self {
+        $this->diplomaFilename = $diplomaFilename;
+        return $this;
+    }
+
+    public function getDiplomaFile(): ?File {
+        return $this->diplomaFile;
+    }
+
+    public function setDiplomaFile(?File $diplomaFile = null): void {
+        $this->diplomaFile = $diplomaFile;
+        if ($diplomaFile !== null) {
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
 
     // --------------------- Appointments ---------------------
     /**

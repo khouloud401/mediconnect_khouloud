@@ -1,28 +1,45 @@
 {% extends 'base.html.twig' %}
+
 {% block title %}Inscription Infirmier - MediConnect{% endblock %}
+
 {% block body %}
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-body p-5">
-                    <h2 class="text-center mb-4">Inscription Infirmier</h2>
-                    {{ form_start(registrationForm) }}
-                    <div class="row">
-                        <div class="col-md-6 mb-3">{{ form_row(registrationForm.nom) }}</div>
-                        <div class="col-md-6 mb-3">{{ form_row(registrationForm.prenom) }}</div>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <h2 class="text-center mb-4">Inscription Infirmier</h2>
+
+                        {{ form_start(registrationForm) }}
+
+                        <div class="row">
+                            {# On utilise 'nom' et 'prenom' car ils sont définis ainsi dans ton FormType #}
+                            <div class="col-md-6 mb-3">{{ form_row(registrationForm.name) }}</div>
+                            <div class="col-md-6 mb-3">{{ form_row(registrationForm.prenom) }}</div>
+                        </div>
+
+                        <div class="mb-3">{{ form_row(registrationForm.email) }}</div>
+                        <div class="mb-3">{{ form_row(registrationForm.phone) }}</div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">{{ form_row(registrationForm.ville) }}</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">{{ form_row(registrationForm.genre) }}</div>
+                            <div class="col-md-6 mb-3">{{ form_row(registrationForm.experience) }}</div>
+                        </div>
+
+                        <div class="mb-3">{{ form_row(registrationForm.nomHopital) }}</div>
+
+                        {# Password répété : on accède à .first et .second #}
+                        <div class="mb-3">{{ form_row(registrationForm.plainPassword.first) }}</div>
+                        <div class="mb-3">{{ form_row(registrationForm.plainPassword.second) }}</div>
+
+                        <button type="submit" class="btn btn-success w-100 mt-3">S'inscrire</button>
+
+                        {{ form_end(registrationForm) }}
                     </div>
-                    <div class="mb-3">{{ form_row(registrationForm.email) }}</div>
-                    <div class="mb-3">{{ form_row(registrationForm.phone) }}</div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">{{ form_row(registrationForm.ville) }}</div>
-                        <div class="col-md-6 mb-3">{{ form_row(registrationForm.service) }}</div>
-                    </div>
-                    <div class="mb-3">{{ form_row(registrationForm.experience) }}</div>
-                    <div class="mb-3">{{ form_row(registrationForm.description) }}</div>
-                    <div class="mb-3">{{ form_row(registrationForm.plainPassword.first) }}</div>
-                    <div class="mb-3">{{ form_row(registrationForm.plainPassword.second) }}</div>
-                    <button type="submit" class="btn btn-success w-100">S'inscrire</button>
-                    {{ form_end(registrationForm) }}
                 </div>
             </div>
         </div>

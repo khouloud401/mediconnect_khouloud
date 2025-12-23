@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Patient;
 use App\Entity\Doctor;
+use App\Entity\Nurse;
+use App\Form\RegistrationNurseType;
 use App\Form\RegistrationPatientType;
 use App\Form\RegistrationDoctorType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -62,6 +64,15 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // 1. On récupère le fichier depuis le formulaire
+            $file = $form->get('diploma')->getData();
+
+            // 2. On le met dans l'entité (Vich s'occupera du reste !)
+            if ($file) {
+                $doctor->setDiplomaFile($file);
+            }
+
+            // 3. On hache le mot de passe
             $doctor->setPassword(
                 $passwordHasher->hashPassword(
                     $doctor,
@@ -69,10 +80,11 @@ class RegistrationController extends AbstractController
                 )
             );
 
+            // 4. On enregistre (Vich déplace le fichier à ce moment-là)
             $entityManager->persist($doctor);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Votre compte médecin a été créé avec succès ! Veuillez attendre l\'approbation de l\'administrateur.');
+            $this->addFlash('success', 'Compte créé ! Veuillez attendre l\'approbation.');
             return $this->redirectToRoute('app_login');
         }
 

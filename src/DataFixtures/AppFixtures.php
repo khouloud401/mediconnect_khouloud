@@ -23,7 +23,7 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        // Create Specialties
+        // 1. Création des Spécialités
         $specialties = [
             ['nom' => 'Médecine Générale', 'description' => 'Consultation générale et suivi médical'],
             ['nom' => 'Cardiologie', 'description' => 'Spécialiste des maladies cardiovasculaires'],
@@ -41,10 +41,10 @@ class AppFixtures extends Fixture
             $specialty->setNom($spec['nom']);
             $specialty->setDescription($spec['description']);
             $manager->persist($specialty);
-            $specialtyObjects[] = $specialty;
+            $specialtyObjects[] = $specialty; // Stockage simple
         }
 
-        // Create Admin
+        // 2. Création de l'Admin
         $admin = new Admin();
         $admin->setEmail('admin@mediconnect.com');
         $admin->setNom('Admin');
@@ -53,7 +53,7 @@ class AppFixtures extends Fixture
         $admin->setPassword($this->passwordHasher->hashPassword($admin, 'admin123'));
         $manager->persist($admin);
 
-        // Create Doctors
+        // 3. Création des Docteurs
         $doctors = [];
         $doctorData = [
             ['nom' => 'Dupont', 'prenom' => 'Jean', 'ville' => 'Paris', 'experience' => '15 ans'],
@@ -68,18 +68,19 @@ class AppFixtures extends Fixture
             $doctor->setEmail(strtolower($data['prenom'] . '.' . $data['nom']) . '@mediconnect.com');
             $doctor->setNom($data['nom']);
             $doctor->setPrenom($data['prenom']);
-            $doctor->setPhone('060000' . str_pad($index + 1, 4, '0', STR_PAD_LEFT));
+            $doctor->setPhone('061000' . str_pad($index, 4, '0', STR_PAD_LEFT));
             $doctor->setVille($data['ville']);
+            // Utilisation d'un index modulo pour ne jamais dépasser le nombre de spécialités
             $doctor->setSpecialty($specialtyObjects[$index % count($specialtyObjects)]);
             $doctor->setExperience($data['experience']);
-            $doctor->setDescription('Médecin expérimenté et dévoué à ses patients.');
+            $doctor->setDescription('Médecin expérimenté et dévoué.');
             $doctor->setHoraires('Lundi-Vendredi: 9h-18h');
             $doctor->setPassword($this->passwordHasher->hashPassword($doctor, 'doctor123'));
             $manager->persist($doctor);
             $doctors[] = $doctor;
         }
 
-        // Create Patients
+        // 4. Création des Patients
         $patients = [];
         $patientData = [
             ['nom' => 'Leroy', 'prenom' => 'Thomas', 'ville' => 'Paris'],
@@ -92,7 +93,7 @@ class AppFixtures extends Fixture
             $patient->setEmail(strtolower($data['prenom'] . '.' . $data['nom']) . '@email.com');
             $patient->setNom($data['nom']);
             $patient->setPrenom($data['prenom']);
-            $patient->setPhone('070000' . str_pad($index + 1, 4, '0', STR_PAD_LEFT));
+            $patient->setPhone('072000' . str_pad($index, 4, '0', STR_PAD_LEFT));
             $patient->setVille($data['ville']);
             $patient->setAdresse(($index + 1) . ' rue de la Paix, ' . $data['ville']);
             $patient->setPassword($this->passwordHasher->hashPassword($patient, 'patient123'));
@@ -100,32 +101,38 @@ class AppFixtures extends Fixture
             $patients[] = $patient;
         }
 
-        // Create Appointments
-        foreach ($patients as $patient) {
-            foreach ($doctors as $index => $doctor) {
-                if ($index < 2) { // 2 appointments per patient
+        // On sauvegarde tout une première fois pour générer les IDs
+        $manager->flush();
+
+        // 5. Création des Rendez-vous (si patients et docteurs existent)
+        if (!empty($patients) && !empty($doctors)) {
+            foreach ($patients as $patient) {
+                for ($i = 0; $i < 2; $i++) {
                     $appointment = new Appointment();
                     $appointment->setPatient($patient);
-                    $appointment->setDoctor($doctor);
-                    $appointment->setDateTime(new \DateTime('+' . ($index + 1) . ' days'));
+                    $appointment->setDoctor($doctors[$i]);
+                    $appointment->setDateTime(new \DateTime('+' . ($i + 1) . ' days'));
                     $appointment->setMotif('Consultation de contrôle');
-                    $appointment->setStatus($index === 0 ? 'pending' : 'accepted');
+                    $appointment->setStatus($i === 0 ? 'pending' : 'accepted');
                     $manager->persist($appointment);
                 }
             }
         }
 
-        // Create Reviews
-        foreach ($doctors as $doctor) {
-            $review = new Review();
-            $review->setDoctor($doctor);
-            $review->setPatient($patients[0]);
-            $review->setRating(rand(4, 5));
-            $review->setComment('Excellent médecin, très professionnel et à l\'écoute.');
-            $review->setIsApproved(true);
-            $manager->persist($review);
+        // 6. Création des Reviews (si patients et docteurs existent)
+        if (!empty($patients) && !empty($doctors)) {
+            foreach ($doctors as $doctor) {
+                $review = new Review();
+                $review->setDoctor($doctor);
+                $review->setPatient($patients[0]);
+                $review->setRating(rand(4, 5));
+                $review->setComment('Excellent médecin, très professionnel.');
+                $review->setIsApproved(true);
+                $manager->persist($review);
+            }
         }
 
+        // Sauvegarde finale
         $manager->flush();
     }
 }

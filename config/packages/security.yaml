@@ -1,48 +1,53 @@
 security:
-    password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+  password_hashers:
+    Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
-    providers:
-        app_user_provider:
-            entity:
-                class: App\Entity\User
-                property: email
+  providers:
+    app_user_provider:
+      entity:
+        class: App\Entity\User
+        property: email
+    # 1. On ajoute le provider pour les infirmiers
+    app_nurse_provider:
+      entity:
+        class: App\Entity\Nurse
+        property: email
 
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
+    # 2. On crée une chaîne pour chercher dans les deux tables
+    all_users:
+      chain:
+        providers: [app_user_provider, app_nurse_provider]
 
-        main:
-            lazy: true
-            provider: app_user_provider
-            form_login:
-                login_path: app_login
-                check_path: app_login
-                enable_csrf: true
-                default_target_path: app_dashboard
-            logout:
-                path: app_logout
-                target: app_home
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
 
-    access_control:
-        - { path: ^/login, roles: PUBLIC_ACCESS }
-        - { path: ^/register, roles: PUBLIC_ACCESS }
-        - { path: ^/patient, roles: ROLE_PATIENT }
-        - { path: ^/doctor, roles: ROLE_DOCTOR }
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/, roles: PUBLIC_ACCESS }
+    main:
+      lazy: true
+      # 3. On utilise le chain_provider ici
+      provider: all_users
+      form_login:
+        login_path: app_login
+        check_path: app_login
+        enable_csrf: true
+        default_target_path: app_dashboard
+      logout:
+        path: app_logout
+        target: app_home
 
-    role_hierarchy:
-        ROLE_ADMIN: [ROLE_DOCTOR, ROLE_PATIENT, ROLE_USER]
-        ROLE_DOCTOR: [ROLE_USER]
-        ROLE_PATIENT: [ROLE_USER]
+  access_control:
+    - { path: ^/login, roles: PUBLIC_ACCESS }
+    - { path: ^/register, roles: PUBLIC_ACCESS }
+    # 4. On ajoute l'accès pour l'infirmier
+    - { path: ^/nurse, roles: ROLE_NURSE }
+    - { path: ^/patient, roles: ROLE_PATIENT }
+    - { path: ^/doctor, roles: ROLE_DOCTOR }
+    - { path: ^/admin, roles: ROLE_ADMIN }
+    - { path: ^/, roles: PUBLIC_ACCESS }
 
-when@test:
-    security:
-        password_hashers:
-            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-                algorithm: auto
-                cost: 4
-                time_cost: 3
-                memory_cost: 10
+  role_hierarchy:
+    ROLE_ADMIN: [ROLE_DOCTOR, ROLE_NURSE, ROLE_PATIENT, ROLE_USER]
+    ROLE_DOCTOR: [ROLE_USER]
+    ROLE_NURSE: [ROLE_USER]
+    ROLE_PATIENT: [ROLE_USER]

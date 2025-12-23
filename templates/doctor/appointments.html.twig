@@ -44,7 +44,7 @@
                                     Terminer
                                 </a>
                             {% elseif appointment.status == 'completed' %}
-                                <a href="{{ path('doctor_create_prescription', {id: appointment.id}) }}" class="btn btn-sm btn-secondary">
+                                <a href="{{ path('doctor_prescriptions', {id: appointment.id}) }}" class="btn btn-sm btn-secondary">
                                     Ordonnance
                                 </a>
                             {% endif %}

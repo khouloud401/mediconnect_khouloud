@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -46,6 +47,7 @@ class RegistrationDoctorType extends AbstractType
                 'class' => Specialty::class,
                 'choice_label' => 'nom',
                 'label' => 'Spécialité',
+                'placeholder' => '--- Choisissez votre spécialité ---',
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('experience', TextType::class, [
@@ -77,8 +79,16 @@ class RegistrationDoctorType extends AbstractType
                         'max' => 4096,
                     ]),
                 ],
+            ])
+            ->add('diploma', FileType::class, [
+                'label' => 'Télécharger votre diplôme (PDF)',
+                'mapped' => false, // Important : car "diploma" n'existe pas dans l'entité, c'est "diplomaFilename"
+                'required' => false,
             ]);
+
+
     }
+
 
     public function configureOptions(OptionsResolver $resolver): void
     {
