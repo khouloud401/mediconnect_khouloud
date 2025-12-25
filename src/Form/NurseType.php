@@ -17,6 +17,10 @@ class NurseType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('prenom', TextType::class, [
+                'label' => 'Prénom',
+                'attr' => ['class' => 'form-control']
+            ])
             ->add('name', TextType::class, [
                 'label' => 'Nom',
                 'attr' => ['class' => 'form-control']
@@ -27,6 +31,22 @@ class NurseType extends AbstractType
             ])
             ->add('phone', TelType::class, [
                 'label' => 'Téléphone',
+                'attr' => ['class' => 'form-control']
+            ])
+            ->add('ville', TextType::class, [
+                'label' => 'Ville',
+                'attr' => ['class' => 'form-control']
+            ])
+            ->add('experience', IntegerType::class, [
+                'label' => 'Expérience (années)',
+                'attr' => ['class' => 'form-control']
+            ])
+            ->add('genre', ChoiceType::class, [
+                'label' => 'Genre',
+                'choices' => [
+                    'Homme' => 'Homme',
+                    'Femme' => 'Femme'
+                ],
                 'attr' => ['class' => 'form-control']
             ])
             ->add('shift', ChoiceType::class, [
@@ -51,5 +71,16 @@ class NurseType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Nurse::class,
         ]);
+    }
+    #[Route('/task/{id}/complete', name: 'app_nurse_complete_task', methods: ['POST'])]
+    public function completeTask(Task $task, EntityManagerInterface $entityManager): Response
+    {
+        // On change le statut de la tâche
+        $task->setStatus('Terminé');
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Soin validé avec succès !');
+
+        return $this->redirectToRoute('app_nurse_index');
     }
 }

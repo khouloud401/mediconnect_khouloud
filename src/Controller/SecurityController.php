@@ -28,20 +28,22 @@ class SecurityController extends AbstractController
     #[Route('/logout', name: 'app_logout')]
     public function logout(): void
     {
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+        throw new \LogicException('This method can be blank.');
     }
 
     #[Route('/dashboard', name: 'app_dashboard')]
     public function dashboard(): Response
     {
         $user = $this->getUser();
-        
+
         if ($this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('admin_dashboard');
         } elseif ($this->isGranted('ROLE_DOCTOR')) {
             return $this->redirectToRoute('doctor_dashboard');
         } elseif ($this->isGranted('ROLE_PATIENT')) {
             return $this->redirectToRoute('patient_dashboard');
+        } elseif ($this->isGranted('ROLE_NURSE')) {
+            return $this->redirectToRoute('app_nurse_index');
         }
 
         return $this->redirectToRoute('app_home');

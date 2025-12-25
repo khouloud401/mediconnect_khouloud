@@ -4,10 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Appointment;
 use App\Entity\Prescription;
+use App\Entity\Nurse;
+use App\Entity\Task;
 use App\Form\DoctorProfileType;
 use App\Form\PrescriptionType;
+use App\Form\NurseType;
 use App\Repository\AppointmentRepository;
 use App\Repository\ReviewRepository;
+use App\Repository\NurseRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -61,6 +65,82 @@ class DoctorController extends AbstractController
         ]);
     }
 
+    // --- GESTION DES INFIRMIERS ---
+
+    #[Route('/nurses', name: 'doctor_nurses_list', methods: ['GET'])]
+    public function listNurses(NurseRepository $nurseRepository): Response
+    {
+        // On affiche uniquement les infirmiers liés au docteur connecté
+        $doctor = $this->getUser();
+
+        return $this->render('doctor/index.html.twig', [
+            'nurses' => $nurseRepository->findBy(['doctor' => $doctor]),
+        ]);
+    }
+
+    #[Route('/add-nurse', name: 'doctor_add_existing_nurse', methods: ['POST'])]
+    public function addExistingNurse(Request $request, NurseRepository $nurseRepository, EntityManagerInterface $em): Response
+    {
+        $email = $request->request->get('email');
+
+        // 1. Chercher si l'infirmier existe par son email
+        $nurse = $nurseRepository->findOneBy(['email' => $email]);
+
+        if (!$nurse) {
+            $this->addFlash('danger', 'Aucun infirmier trouvé avec cet email.');
+            return $this->redirectToRoute('doctor_nurses_list');
+        }
+
+        // 2. Lier le docteur actuel à cet infirmier
+        $doctor = $this->getUser();
+        $nurse->setDoctor($doctor);
+
+        $em->persist($nurse);
+        $em->flush();
+
+        $this->addFlash('success', 'L\'infirmier ' . $nurse->getName() . ' a été ajouté à votre liste.');
+
+        return $this->redirectToRoute('doctor_nurses_list');
+    }
+
+    #[Route('/nurse/assign-task/{id}', name: 'doctor_assign_task', methods: ['POST'])]
+    public function assignTask(Request $request, Nurse $nurse, EntityManagerInterface $entityManager): Response
+    {
+        $description = $request->request->get('description');
+        $patientName = $request->request->get('patientName');
+
+        if ($description && $patientName) {
+            $task = new Task();
+            $task->setDescription($description);
+            $task->setPatientName($patientName);
+            $task->setStatus('En cours');
+            $task->setCreatedAt(new \DateTimeImmutable());
+            $task->setNurse($nurse);
+            $task->setDoctor($this->getUser());
+
+            $entityManager->persist($task);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Tâche envoyée avec succès.');
+        }
+
+        return $this->redirectToRoute('doctor_nurses_list');
+    }
+
+    #[Route('/nurse/delete/{id}', name: 'doctor_nurse_delete', methods: ['POST'])]
+    public function deleteNurse(Request $request, Nurse $nurse, EntityManagerInterface $entityManager): Response
+    {
+        // Au lieu de supprimer l'infirmier de la base, on retire juste le lien avec ce docteur
+        if ($this->isCsrfTokenValid('delete'.$nurse->getId(), $request->request->get('_token'))) {
+            $nurse->setDoctor(null);
+            $entityManager->flush();
+            $this->addFlash('success', 'Infirmier retiré de votre liste.');
+        }
+        return $this->redirectToRoute('doctor_nurses_list');
+    }
+
+    // --- FIN GESTION INFIRMIERS ---
+
     #[Route('/profile', name: 'doctor_profile')]
     public function profile(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -70,7 +150,7 @@ class DoctorController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-            $this->addFlash('success', 'Votre profil a été mis à jour avec succès !');
+            $this->addFlash('success', 'Votre profil a été mis à jour !');
             return $this->redirectToRoute('doctor_profile');
         }
 
@@ -110,43 +190,11 @@ class DoctorController extends AbstractController
         if ($appointment->getDoctor() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
-
         $appointment->setStatus('accepted');
         $entityManager->flush();
-
-        $this->addFlash('success', 'Rendez-vous accepté avec succès !');
         return $this->redirectToRoute('doctor_appointments');
     }
 
-    #[Route('/appointment/{id}/refuse', name: 'doctor_refuse_appointment')]
-    public function refuseAppointment(Appointment $appointment, EntityManagerInterface $entityManager): Response
-    {
-        if ($appointment->getDoctor() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
-        }
-
-        $appointment->setStatus('refused');
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Rendez-vous refusé.');
-        return $this->redirectToRoute('doctor_appointments');
-    }
-
-    #[Route('/appointment/{id}/complete', name: 'doctor_complete_appointment')]
-    public function completeAppointment(Appointment $appointment, EntityManagerInterface $entityManager): Response
-    {
-        if ($appointment->getDoctor() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
-        }
-
-        $appointment->setStatus('completed');
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Rendez-vous marqué comme terminé.');
-        return $this->redirectToRoute('doctor_appointments');
-    }
-
-    // ✅ Unified prescriptions page (list + create)
     #[Route('/prescriptions/{appointmentId?}', name: 'doctor_prescriptions')]
     public function prescriptions(
         ?int $appointmentId = null,
@@ -158,27 +206,21 @@ class DoctorController extends AbstractController
 
         if ($appointmentId) {
             $appointment = $entityManager->getRepository(Appointment::class)->find($appointmentId);
-
             if (!$appointment || $appointment->getDoctor() !== $doctor) {
                 throw $this->createAccessDeniedException();
             }
-
             $prescription = new Prescription();
             $prescription->setAppointment($appointment);
-
             $form = $this->createForm(PrescriptionType::class, $prescription);
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
                 $entityManager->persist($prescription);
                 $entityManager->flush();
-
-                $this->addFlash('success', 'Ordonnance créée avec succès !');
                 return $this->redirectToRoute('doctor_prescriptions');
             }
         }
 
-        // List all prescriptions of this doctor
         $prescriptions = $entityManager->getRepository(Prescription::class)
             ->createQueryBuilder('p')
             ->join('p.appointment', 'a')
@@ -198,22 +240,12 @@ class DoctorController extends AbstractController
     public function patients(): Response
     {
         $doctor = $this->getUser();
-
-        $appointments = $doctor->getAppointments()->filter(function ($appointment) {
-            return $appointment->getStatus() === 'completed';
-        });
-
+        $appointments = $doctor->getAppointments()->filter(fn($a) => $a->getStatus() === 'completed');
         $patients = [];
-        foreach ($appointments as $appointment) {
-            $patientId = $appointment->getPatient()->getId();
-            if (!isset($patients[$patientId])) {
-                $patients[$patientId] = $appointment->getPatient();
-            }
+        foreach ($appointments as $a) {
+            $patients[$a->getPatient()->getId()] = $a->getPatient();
         }
-
-        return $this->render('doctor/patients.html.twig', [
-            'patients' => array_values($patients),
-        ]);
+        return $this->render('doctor/patients.html.twig', ['patients' => array_values($patients)]);
     }
 
     #[Route('/statistics', name: 'doctor_statistics')]
@@ -222,19 +254,12 @@ class DoctorController extends AbstractController
         ReviewRepository $reviewRepository
     ): Response {
         $doctor = $this->getUser();
-
-        $totalAppointments = $appointmentRepository->count(['doctor' => $doctor]);
-        $completedAppointments = $appointmentRepository->count(['doctor' => $doctor, 'status' => 'completed']);
-        $pendingAppointments = $appointmentRepository->count(['doctor' => $doctor, 'status' => 'pending']);
-        $averageRating = $doctor->getAverageRating();
-        $totalReviews = $reviewRepository->count(['doctor' => $doctor, 'isApproved' => true]);
-
         return $this->render('doctor/statistics.html.twig', [
-            'totalAppointments' => $totalAppointments,
-            'completedAppointments' => $completedAppointments,
-            'pendingAppointments' => $pendingAppointments,
-            'averageRating' => $averageRating,
-            'totalReviews' => $totalReviews,
+            'totalAppointments' => $appointmentRepository->count(['doctor' => $doctor]),
+            'completedAppointments' => $appointmentRepository->count(['doctor' => $doctor, 'status' => 'completed']),
+            'pendingAppointments' => $appointmentRepository->count(['doctor' => $doctor, 'status' => 'pending']),
+            'averageRating' => $doctor->getAverageRating(),
+            'totalReviews' => $reviewRepository->count(['doctor' => $doctor, 'isApproved' => true]),
         ]);
     }
 }

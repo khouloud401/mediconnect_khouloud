@@ -7,13 +7,11 @@ security:
       entity:
         class: App\Entity\User
         property: email
-    # 1. On ajoute le provider pour les infirmiers
     app_nurse_provider:
       entity:
         class: App\Entity\Nurse
         property: email
 
-    # 2. On crée une chaîne pour chercher dans les deux tables
     all_users:
       chain:
         providers: [app_user_provider, app_nurse_provider]
@@ -25,7 +23,6 @@ security:
 
     main:
       lazy: true
-      # 3. On utilise le chain_provider ici
       provider: all_users
       form_login:
         login_path: app_login
@@ -39,8 +36,10 @@ security:
   access_control:
     - { path: ^/login, roles: PUBLIC_ACCESS }
     - { path: ^/register, roles: PUBLIC_ACCESS }
-    # 4. On ajoute l'accès pour l'infirmier
-    - { path: ^/nurse, roles: ROLE_NURSE }
+
+    # CHANGEMENT ICI : On autorise le Docteur et l'Admin à accéder au préfixe /nurse
+    - { path: ^/nurse, roles: [ROLE_NURSE, ROLE_DOCTOR, ROLE_ADMIN] }
+
     - { path: ^/patient, roles: ROLE_PATIENT }
     - { path: ^/doctor, roles: ROLE_DOCTOR }
     - { path: ^/admin, roles: ROLE_ADMIN }

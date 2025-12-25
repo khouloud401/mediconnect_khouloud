@@ -41,7 +41,6 @@
     </div>
 
     <div class="row mt-4">
-        <!-- Pending Appointments -->
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
@@ -61,14 +60,20 @@
             </div>
         </div>
 
-        <!-- Quick Actions -->
         <div class="col-md-6">
-            <div class="card mb-4">
+            <div class="card mb-4 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">Actions Rapides</h5>
+                    <h5 class="card-title mb-3">Actions Rapides</h5>
                     <div class="d-grid gap-2">
                         <a href="{{ path('doctor_appointments') }}" class="btn btn-outline-primary">Tous mes rendez-vous</a>
                         <a href="{{ path('doctor_patients') }}" class="btn btn-outline-success">Mes patients</a>
+
+                        {# --- NOUVEAU BOUTON : DONNER DES TACHES --- #}
+                        <a href="{{ path('doctor_nurses_list') }}" class="btn btn-primary py-2 shadow-sm">
+                            <i class="fas fa-user-nurse me-2"></i> Donner des tâches
+                        </a>
+                        {# ------------------------------------------ #}
+
                         <a href="{{ path('doctor_statistics') }}" class="btn btn-outline-info">Statistiques</a>
                         <a href="{{ path('doctor_profile') }}" class="btn btn-outline-secondary">Mon profil</a>
                         <a href="{{ path('doctor_prescriptions') }}" class="btn btn-outline-info">Mes ordonnances</a>

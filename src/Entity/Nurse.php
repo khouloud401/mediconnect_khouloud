@@ -7,15 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
-<?php
-
-namespace App\Entity;
-
-use App\Repository\NurseRepository;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-
 #[ORM\Entity(repositoryClass: NurseRepository::class)]
 class Nurse implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -23,6 +14,11 @@ class Nurse implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    // --- AJOUT DE LA RELATION ICI ---
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $doctor = null;
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;
@@ -57,15 +53,22 @@ class Nurse implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    /**
-     * Cette méthode permet à Twig d'utiliser {{ app.user.fullName }}
-     */
+    // --- GETTER ET SETTER POUR DOCTOR ---
+    public function getDoctor(): ?User
+    {
+        return $this->doctor;
+    }
+
+    public function setDoctor(?User $doctor): static
+    {
+        $this->doctor = $doctor;
+        return $this;
+    }
+
     public function getFullName(): string
     {
         return $this->prenom . ' ' . $this->name;
     }
-
-    // --- Méthodes obligatoires pour la sécurité ---
 
     public function getUserIdentifier(): string
     {
@@ -79,10 +82,7 @@ class Nurse implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials(): void
     {
-        // Nettoyage des données sensibles temporaires si nécessaire
     }
-
-    // --- Getters et Setters ---
 
     public function getId(): ?int
     {

@@ -1,0 +1,229 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Infirmiers{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        .main-container { max-width: 1400px; margin: 0 auto; }
+        .header-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        .stat-number { font-size: 2.5rem; font-weight: bold; }
+        .stat-label { font-size: 1rem; opacity: 0.9; }
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .table { font-size: 1.1rem; }
+        .table thead th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.2rem;
+        }
+        .table tbody tr:hover { background: #f0f0ff; transform: scale(1.01); transition: all 0.3s; }
+        .table tbody td { padding: 15px; vertical-align: middle; }
+        .badge { font-size: 0.95rem; padding: 8px 15px; border-radius: 20px; }
+        .badge-morning { background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); color: #000; }
+        .badge-evening { background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%); color: #fff; }
+        .badge-night { background: linear-gradient(135deg, #3f51b5 0%, #1a237e 100%); color: #fff; }
+        .btn-add {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none; border-radius: 30px; padding: 15px 40px;
+            font-size: 1.2rem; font-weight: bold; color: white;
+            box-shadow: 0 5px 20px rgba(40, 167, 69, 0.4); text-decoration: none;
+            cursor: pointer;
+        }
+        .action-btn { margin: 0 5px; padding: 8px 15px; border-radius: 10px; font-size: 0.9rem; transition: all 0.3s; }
+        .nurse-name { font-weight: bold; color: #667eea; font-size: 1.1rem; }
+        .team-badge { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="main-container">
+        {% for message in app.flashes('danger') %}
+            <div class="alert alert-danger alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+
+        <div class="header-section">
+            <div class="header-title">
+                <i class="fas fa-user-nurse fa-2x"></i>
+                Gestion des Infirmiers
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="stats-cards flex-grow-1 me-4">
+                    <div class="stat-card">
+                        <div class="stat-number">{{ nurses|length }}</div>
+                        <div class="stat-label">Total Infirmiers</div>
+                    </div>
+                </div>
+                <div>
+                    {# Bouton vert pour lier un infirmier existant #}
+                    <button type="button" class="btn btn-add" data-bs-toggle="modal" data-bs-target="#searchNurseModal">
+                        <i class="fas fa-plus-circle"></i> Ajouter un Infirmier
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {# MODALE DE RECHERCHE PAR EMAIL #}
+        <div class="modal fade" id="searchNurseModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content text-dark">
+                    <form action="{{ path('doctor_add_existing_nurse') }}" method="POST">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title">Lier un infirmier à votre équipe</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="small text-muted">L'infirmier doit déjà avoir un compte MediConnect.</p>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Email de l'infirmier</label>
+                                <input type="email" name="email" class="form-control" placeholder="exemple@email.com" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="hidden" name="_token" value="{{ csrf_token('add_nurse') }}">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-success">Ajouter l'infirmier</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            {% if nurses|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Équipe</th>
+                            <th>N° Équipe</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for nurse in nurses %}
+                            <tr>
+                                <td>{{ nurse.id }}</td>
+                                <td class="nurse-name">{{ nurse.name }}</td>
+                                <td>
+                                    {% if nurse.shift == 'morning' %}
+                                        <span class="badge badge-morning">☀️ Matin</span>
+                                    {% elseif nurse.shift == 'evening' %}
+                                        <span class="badge badge-evening">🌆 Soir</span>
+                                    {% elseif nurse.shift == 'night' %}
+                                        <span class="badge badge-night">🌙 Nuit</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Non défini</span>
+                                    {% endif %}
+                                </td>
+                                <td><span class="team-badge">{{ nurse.teamNumber ?? '-' }}</span></td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-primary action-btn shadow-sm" data-bs-toggle="modal" data-bs-target="#taskModal{{ nurse.id }}">
+                                        <i class="fas fa-notes-medical"></i> Donner une tâche
+                                    </button>
+
+                                    <form method="post" action="{{ path('doctor_nurse_delete', {'id': nurse.id}) }}" style="display:inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ nurse.id) }}">
+                                        <button class="btn btn-danger action-btn" onclick="return confirm('Retirer cet infirmier de votre liste ?');">
+                                            <i class="fas fa-user-minus"></i> Retirer
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+
+                            {# MODALE DE TÂCHE #}
+                            <div class="modal fade" id="taskModal{{ nurse.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content border-0 shadow text-dark">
+                                        <form action="{{ path('doctor_assign_task', {id: nurse.id}) }}" method="POST">
+                                            <div class="modal-header bg-primary text-white">
+                                                <h5 class="modal-title">Soin à faire par {{ nurse.name }}</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Nom du Patient</label>
+                                                    <input type="text" name="patientName" class="form-control" placeholder="Ex: Jean Dupont" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Description du soin</label>
+                                                    <textarea name="description" class="form-control" rows="3" placeholder="Ex: Changement de pansement à 10h..." required></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer bg-light">
+                                                {# Optionnel : token de sécurité pour la tâche #}
+                                                <input type="hidden" name="_token" value="{{ csrf_token('assign_task' ~ nurse.id) }}">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                <button type="submit" class="btn btn-primary px-4">Envoyer l'ordre</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center py-4">
+                    <i class="fas fa-info-circle fa-2x mb-2"></i><br>
+                    Aucun infirmier dans votre équipe. Cliquez sur <strong>Ajouter un Infirmier</strong> pour commencer.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}

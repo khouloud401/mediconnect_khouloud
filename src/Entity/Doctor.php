@@ -50,6 +50,7 @@ class Doctor extends User
         $this->appointments = new ArrayCollection();
         $this->reviews = new ArrayCollection();
         $this->setRoles(['ROLE_DOCTOR']);
+        $this->tasks = new ArrayCollection();
     }
 
     // --------------------- Specialty ---------------------
@@ -156,6 +157,12 @@ class Doctor extends User
     #[Vich\UploadableField(mapping: 'doctor_diplomas', fileNameProperty: 'diplomaFilename')]
     private ?File $diplomaFile = null;
 
+    /**
+     * @var Collection<int, Task>
+     */
+    #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'doctor')]
+    private Collection $tasks;
+
     // --- Ajoute les méthodes (Getters et Setters) ---
 
     public function getDiplomaFilename(): ?string {
@@ -254,5 +261,35 @@ class Doctor extends User
     public function getTotalConsultations(): int
     {
         return $this->appointments->filter(fn(Appointment $a) => $a->getStatus() === 'completed')->count();
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): static
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setDoctor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTask(Task $task): static
+    {
+        if ($this->tasks->removeElement($task)) {
+            // set the owning side to null (unless already changed)
+            if ($task->getDoctor() === $this) {
+                $task->setDoctor(null);
+            }
+        }
+
+        return $this;
     }
 }
