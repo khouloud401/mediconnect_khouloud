@@ -70,7 +70,6 @@ class DoctorController extends AbstractController
     #[Route('/nurses', name: 'doctor_nurses_list', methods: ['GET'])]
     public function listNurses(NurseRepository $nurseRepository): Response
     {
-        // On affiche uniquement les infirmiers liés au docteur connecté
         $doctor = $this->getUser();
 
         return $this->render('doctor/index.html.twig', [
@@ -82,8 +81,6 @@ class DoctorController extends AbstractController
     public function addExistingNurse(Request $request, NurseRepository $nurseRepository, EntityManagerInterface $em): Response
     {
         $email = $request->request->get('email');
-
-        // 1. Chercher si l'infirmier existe par son email
         $nurse = $nurseRepository->findOneBy(['email' => $email]);
 
         if (!$nurse) {
@@ -91,7 +88,6 @@ class DoctorController extends AbstractController
             return $this->redirectToRoute('doctor_nurses_list');
         }
 
-        // 2. Lier le docteur actuel à cet infirmier
         $doctor = $this->getUser();
         $nurse->setDoctor($doctor);
 
@@ -130,7 +126,6 @@ class DoctorController extends AbstractController
     #[Route('/nurse/delete/{id}', name: 'doctor_nurse_delete', methods: ['POST'])]
     public function deleteNurse(Request $request, Nurse $nurse, EntityManagerInterface $entityManager): Response
     {
-        // Au lieu de supprimer l'infirmier de la base, on retire juste le lien avec ce docteur
         if ($this->isCsrfTokenValid('delete'.$nurse->getId(), $request->request->get('_token'))) {
             $nurse->setDoctor(null);
             $entityManager->flush();
@@ -192,6 +187,35 @@ class DoctorController extends AbstractController
         }
         $appointment->setStatus('accepted');
         $entityManager->flush();
+        $this->addFlash('success', 'Rendez-vous accepté.');
+        return $this->redirectToRoute('doctor_dashboard');
+    }
+
+    /**
+     * AJOUT : Fonction pour refuser un rendez-vous (Corrige l'erreur RouteNotFound)
+     */
+    #[Route('/appointment/{id}/refuse', name: 'doctor_refuse_appointment')]
+    public function refuseAppointment(Appointment $appointment, EntityManagerInterface $entityManager): Response
+    {
+        if ($appointment->getDoctor() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+        $appointment->setStatus('refused');
+        $entityManager->flush();
+        $this->addFlash('danger', 'Rendez-vous refusé.');
+        return $this->redirectToRoute('doctor_dashboard');
+    }
+    #[Route('/appointment/{id}/complete', name: 'doctor_complete_appointment')]
+    public function completeAppointment(Appointment $appointment, EntityManagerInterface $entityManager): Response
+    {
+        if ($appointment->getDoctor() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+        $appointment->setStatus('completed'); // Change le statut en 'completed'
+        $entityManager->flush();
+
+        $this->addFlash('success', 'La consultation est terminée.');
+
         return $this->redirectToRoute('doctor_appointments');
     }
 
