@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <style>
+        :root { --bg: #fdfaf7; --accent: #d4a373; }
+        body { background-color: var(--bg); }
+        .spec-grid-card { background: white; border-radius: 25px; padding: 35px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        .btn-icon-back { width: 42px; height: 42px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; color: var(--accent); border: 1px solid #eee; text-decoration: none; transition: 0.3s; }
+        .btn-icon-back:hover { background: var(--accent); color: white; }
+        .spec-item { background: #f9f4ef; border-radius: 15px; padding: 15px 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    </style>
+
+    <div class="container mt-5">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <a href="{{ path('admin_dashboard') }}" class="btn-icon-back"><i class="bi bi-arrow-left"></i></a>
+            <h2 class="fw-bold m-0">Spécialités</h2>
+            <a href="{{ path('admin_specialty_new') }}" class="btn btn-dark rounded-pill px-4">Nouveau</a>
+        </div>
+
+        <div class="spec-grid-card">
+            <div class="row">
+                {% for specialty in specialties %}
+                    <div class="col-md-6">
+                        <div class="spec-item">
+                            <span class="fw-bold">{{ specialty.nom }}</span>
+                            <div>
+                                <a href="{{ path('admin_specialty_edit', {id: specialty.id}) }}" class="text-muted me-2"><i class="bi bi-pencil"></i></a>
+                                <form method="post" action="{{ path('admin_specialty_delete', {id: specialty.id}) }}" class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ specialty.id) }}">
+                                    <button class="btn btn-link text-danger p-0"><i class="bi bi-x-circle"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

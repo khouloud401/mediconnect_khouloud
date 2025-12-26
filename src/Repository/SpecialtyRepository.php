@@ -12,4 +12,15 @@ class SpecialtyRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Specialty::class);
     }
+    public function findTopSpecialties(int $limit = 10): array
+    {
+        return $this->createQueryBuilder('s')
+            ->leftJoin('s.doctors', 'd')
+            ->select('s as specialty', 'COUNT(d.id) as doctorCount')
+            ->groupBy('s.id')
+            ->orderBy('doctorCount', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

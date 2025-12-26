@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <style>
+        :root { --bg: #fdfaf7; --accent: #d4a373; }
+        body { background-color: var(--bg); }
+        .apt-glass-card { background: white; border-radius: 25px; padding: 30px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        .btn-icon-back { width: 42px; height: 42px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; color: var(--accent); border: 1px solid #eee; text-decoration: none; transition: 0.3s; }
+        .btn-icon-back:hover { background: var(--accent); color: white; }
+        .time-pill { background: #fdf0e6; color: var(--accent); border-radius: 8px; padding: 4px 12px; font-weight: bold; font-size: 0.85rem; }
+
+        /* Style pour l'indicateur de filtre */
+        .filter-info { background: #fff; padding: 10px 20px; border-radius: 15px; border: 1px solid #eee; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 10px; }
+    </style>
+
+    <div class="container mt-5">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <a href="{{ path('admin_dashboard') }}" class="btn-icon-back"><i class="bi bi-arrow-left"></i></a>
+            <h2 class="fw-bold m-0">Rendez-vous</h2>
+            <div style="width: 42px"></div>
+        </div>
+
+        {# Affichage si un filtre est actif #}
+        {% if app.request.query.get('doctor') or app.request.query.get('patient') %}
+            <div class="filter-info">
+                <span class="small text-muted italic">Filtrage actif</span>
+                <a href="{{ path('admin_appointments') }}" class="btn btn-sm btn-outline-secondary rounded-pill">Effacer le filtre</a>
+            </div>
+        {% endif %}
+
+        <div class="apt-glass-card">
+            <table class="table align-middle">
+                <thead class="text-muted small">
+                <tr>
+                    <th>Date & Heure</th>
+                    <th>Patient</th>
+                    <th>Docteur</th>
+                    <th class="text-end">Statut</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for apt in appointments %}
+                    <tr>
+                        <td><span class="time-pill">{{ apt.dateTime|date('d/m/Y H:i') }}</span></td>
+                        {# Lien pour filtrer par ce patient #}
+                        <td class="fw-bold">
+                            <a href="{{ path('admin_appointments', {'patient': apt.patient.id}) }}" class="text-decoration-none text-dark">
+                                {{ apt.patient.nom|default(apt.patient.userIdentifier) }}
+                            </a>
+                        </td>
+                        {# Lien pour filtrer par ce docteur #}
+                        <td>
+                            <a href="{{ path('admin_appointments', {'doctor': apt.doctor.id}) }}" class="text-decoration-none text-dark">
+                                Dr. {{ apt.doctor.nom|default('Inconnu') }}
+                            </a>
+                        </td>
+                        <td class="text-end">
+                            <span class="badge bg-light text-dark rounded-pill px-3">Confirmé</span>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">Aucun rendez-vous trouvé pour ce filtre.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

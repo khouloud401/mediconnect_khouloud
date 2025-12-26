@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Patients - MediConnect{% endblock %}
+
+{% block body %}
+    <style>
+        :root {
+            --nude-bg: #fdfaf7;
+            --nude-accent: #d4a373;
+            --nude-text: #4a3f35;
+        }
+        body { background-color: var(--nude-bg); color: var(--nude-text); }
+
+        .admin-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 25px;
+        }
+
+        /* Style pour le bouton Retour Dashboard */
+        .btn-back {
+            background-color: transparent;
+            color: var(--nude-accent);
+            border: 1px solid var(--nude-accent);
+            border-radius: 12px;
+            padding: 10px 20px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+        .btn-back:hover { background-color: var(--nude-accent); color: white; }
+
+        .table { border-collapse: separate; border-spacing: 0 10px; }
+        .table thead th { border: none; letter-spacing: 1px; }
+        .table tbody tr { background: white; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .table tbody td { padding: 15px; vertical-align: middle; border: none; }
+    </style>
+
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="fw-bold">Gestion des Patients</h1>
+                <p class="text-muted">Liste des comptes patients enregistrés via l'inscription.</p>
+            </div>
+            <a href="{{ path('admin_dashboard') }}" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Retour Dashboard
+            </a>
+        </div>
+
+        <div class="admin-card">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr class="text-muted small">
+                        <th>PATIENT</th>
+                        <th>CONTACT</th>
+                        <th class="text-end">ACTIONS</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for patient in patients %}
+                        <tr>
+                            <td class="fw-bold">
+                                <i class="bi bi-person-circle me-2" style="color: var(--nude-accent); font-size: 1.2rem;"></i>
+                                {{ patient.nom|default(patient.name|default('Inconnu'))|upper }}
+                                {{ patient.prenom|default(patient.firstName|default('')) }}
+                            </td>
+                            <td>
+                                <div class="small"><i class="bi bi-envelope me-1"></i> {{ patient.email }}</div>
+                                <div class="small text-muted"><i class="bi bi-telephone me-1"></i> {{ patient.phone|default('N/A') }}</div>
+                            </td>
+                            <td class="text-end">
+                                {# Le bouton "Modifier" a été retiré pour la modération #}
+                                <form method="post" action="{{ path('admin_patient_delete', {id: patient.id}) }}" onsubmit="return confirm('Attention : La suppression d\'un patient efface son historique de rendez-vous. Confirmer ?');" class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ patient.id) }}">
+                                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                        <i class="bi bi-trash me-1"></i> Supprimer
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-5">Aucun patient n'est actuellement inscrit.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-center">
+                {{ knp_pagination_render(patients) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

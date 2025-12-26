@@ -24,31 +24,33 @@ class DoctorRepository extends ServiceEntityRepository
 
         if ($specialty) {
             $qb->andWhere('s.nom LIKE :specialty')
-               ->setParameter('specialty', '%' . $specialty . '%');
+                ->setParameter('specialty', '%' . $specialty . '%');
         }
 
         if ($ville) {
             $qb->andWhere('d.ville LIKE :ville')
-               ->setParameter('ville', '%' . $ville . '%');
+                ->setParameter('ville', '%' . $ville . '%');
         }
 
         if ($nom) {
             $qb->andWhere('d.nom LIKE :nom OR d.prenom LIKE :nom')
-               ->setParameter('nom', '%' . $nom . '%');
+                ->setParameter('nom', '%' . $nom . '%');
         }
 
         return $qb->getQuery()->getResult();
     }
 
-    public function findTopRatedDoctors(int $limit = 10)
+
+    public function findTopDoctors(int $limit = 10): array
     {
         return $this->createQueryBuilder('d')
-            ->leftJoin('d.reviews', 'r')
-            ->addSelect('AVG(r.rating) as HIDDEN avg_rating')
+            ->leftJoin('d.appointments', 'a')
+            ->select('d as doctor', 'COUNT(a.id) as appCount')
             ->groupBy('d.id')
-            ->orderBy('avg_rating', 'DESC')
+            ->orderBy('appCount', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
 }
+

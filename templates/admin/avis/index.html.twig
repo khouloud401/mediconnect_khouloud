@@ -1,0 +1,150 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <style>
+        :root {
+            --bg: #fdfaf7;
+            --accent: #d4a373;
+            --text-main: #2d2d2d;
+            --star-color: #ffc107;
+        }
+        body { background-color: var(--bg); font-family: 'Inter', sans-serif; }
+
+        .btn-icon-back {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: white; display: flex; align-items: center;
+            justify-content: center; color: var(--accent);
+            border: 1px solid #eee; text-decoration: none; transition: 0.3s;
+        }
+        .btn-icon-back:hover { background: var(--accent); color: white; }
+
+        .review-card {
+            background: #fff9f5;
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s;
+        }
+        .review-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .author-name {
+            font-weight: 700;
+            color: var(--text-main);
+            min-width: 140px;
+        }
+
+        .comment-text {
+            color: #888;
+            font-style: italic;
+            font-size: 0.9rem;
+            flex-grow: 1;
+            margin: 0 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .review-date {
+            color: #555;
+            font-size: 0.85rem;
+            margin-right: 20px;
+        }
+
+        .btn-delete {
+            color: #ef4444;
+            background: none;
+            border: 1px solid #fee2e2;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+        .btn-delete:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .glass-container {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.02);
+        }
+
+        .stars-container {
+            color: var(--star-color);
+            display: flex;
+            gap: 2px;
+            margin-right: 15px;
+        }
+    </style>
+
+    <div class="container mt-5">
+        <div class="d-flex align-items-center justify-content-between mb-5">
+            <a href="{{ path('admin_dashboard') }}" class="btn-icon-back"><i class="bi bi-arrow-left"></i></a>
+            <h1 class="fw-bold m-0" style="font-size: 2rem; color: #1a1a1a;">Gestion des Avis</h1>
+            <div style="width: 42px"></div>
+        </div>
+
+        <div class="glass-container">
+            <div class="row">
+                {% for review in reviews %}
+                    <div class="col-md-12">
+                        <div class="review-card">
+                            <div class="d-flex align-items-center flex-grow-1">
+                                {# Affichage du nom du patient (via l'entité Patient/User) #}
+                                <span class="author-name">
+                                    {{ review.patient.nom|default(review.patient.userIdentifier) }}
+                                </span>
+
+                                {# Affichage des étoiles Bootstrap #}
+                                <div class="stars-container ms-3">
+                                    {% for i in 1..5 %}
+                                        {% if i <= review.rating %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-star text-muted" style="opacity: 0.3;"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+
+                                <span class="comment-text">"{{ review.comment|slice(0, 80) }}..."</span>
+                            </div>
+
+                            <div class="d-flex align-items-center">
+                                <span class="review-date">{{ review.createdAt|date('d/m/Y') }}</span>
+
+                                <div class="action-buttons">
+                                    <form method="post" action="{{ path('admin_review_delete', {id: review.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer cet avis ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ review.id) }}">
+                                        <button type="submit" class="btn-delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted">Aucun avis trouvé.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="text-center mt-5 mb-4">
+            <p class="text-muted small">© 2024 MediConnect - Tous droits réservés</p>
+        </div>
+    </div>
+{% endblock %}

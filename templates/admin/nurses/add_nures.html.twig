@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <style>
+        :root { --nude-bg: #fdfaf7; --nude-accent: #d4a373; }
+        body { background-color: var(--nude-bg); }
+        .nurse-card { background: white; border-radius: 20px; border: none; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.03); }
+    </style>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="nurse-card">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-heart-pulse fs-1" style="color: var(--nude-accent)"></i>
+                        <h2 class="fw-bold mt-2">{{ editMode ? 'Modifier Infirmier' : 'Nouvel Infirmier' }}</h2>
+                    </div>
+
+                    {{ form_start(form) }}
+                    {# Symfony utilise ici les noms définis dans NurseType.php #}
+                    {{ form_widget(form) }}
+
+                    <button class="btn btn-dark w-100 rounded-pill py-3 mt-4">
+                        {{ editMode ? 'Mettre à jour le profil' : 'Ajouter à l\'équipe' }}
+                    </button>
+                    {{ form_end(form) }}
+
+                    <a href="{{ path('admin_nurses') }}" class="btn btn-link w-100 mt-2 text-muted text-decoration-none">Retour à la liste</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

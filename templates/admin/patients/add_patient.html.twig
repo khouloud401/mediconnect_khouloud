@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <style>
+        :root { --nude-bg: #fdfaf7; --nude-accent: #d4a373; --nude-text: #4a3f35; }
+        body { background-color: var(--nude-bg); color: var(--nude-text); }
+        .form-card { background: white; border-radius: 25px; border: none; box-shadow: 0 15px 35px rgba(212, 163, 115, 0.1); padding: 40px; }
+        .btn-save { background-color: var(--nude-accent); color: white; border-radius: 12px; padding: 12px 30px; border: none; width: 100%; }
+    </style>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="form-card">
+                    <h2 class="fw-bold mb-4 text-center">Gestion Patient</h2>
+                    {{ form_start(form) }}
+                    <div class="mb-3">{{ form_row(form.nom) }}</div>
+                    <div class="mb-3">{{ form_row(form.prenom) }}</div>
+                    <div class="mb-3">{{ form_row(form.email) }}</div>
+                    <div class="mb-3">{{ form_row(form.phone) }}</div>
+                    {% if not editMode %}<div class="mb-3">{{ form_row(form.password) }}</div>{% endif %}
+
+                    <button type="submit" class="btn btn-save mt-4">
+                        {{ editMode ? 'Modifier les informations' : 'Enregistrer le patient' }}
+                    </button>
+                    <div class="text-center mt-3">
+                        <a href="{{ path('admin_patients') }}" class="text-muted small">Annuler et retourner à la liste</a>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

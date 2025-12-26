@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Médecins - MediConnect{% endblock %}
+
+{% block body %}
+    <style>
+        :root {
+            --nude-bg: #fdfaf7;
+            --nude-card: #ffffff;
+            --nude-accent: #d4a373; /* Terre de sienne doux */
+            --nude-text: #4a3f35;
+            --nude-secondary: #e9edc9;
+        }
+
+        body { background-color: var(--nude-bg); color: var(--nude-text); }
+
+        .admin-card {
+            background: var(--nude-card);
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 20px;
+        }
+
+        /* Style pour le bouton Retour Dashboard */
+        .btn-back {
+            background-color: transparent;
+            color: var(--nude-accent);
+            border: 1px solid var(--nude-accent);
+            border-radius: 12px;
+            padding: 10px 20px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+        .btn-back:hover { background-color: var(--nude-accent); color: white; }
+
+        .table { color: var(--nude-text); border-collapse: separate; border-spacing: 0 10px; }
+        .table thead th { border: none; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        .table tbody tr { background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.02); border-radius: 15px; }
+        .table tbody td { padding: 20px; vertical-align: middle; border: none; }
+        .table tbody tr td:first-child { border-radius: 15px 0 0 15px; }
+        .table tbody tr td:last-child { border-radius: 0 15px 15px 0; }
+
+        .badge-specialty {
+            background-color: var(--nude-secondary);
+            color: #606c38;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+    </style>
+
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h1 class="fw-bold">Équipe Médicale</h1>
+                <p class="text-muted">Consultez la liste des praticiens et gérez les accès.</p>
+            </div>
+            <a href="{{ path('admin_dashboard') }}" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Retour Dashboard
+            </a>
+        </div>
+
+        <div class="admin-card">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Médecin</th>
+                        <th>Spécialité</th>
+                        <th>Contact</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for doctor in doctors %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-light d-flex justify-content-center align-items-center me-3" style="width: 45px; height: 45px; color: var(--nude-accent); border: 1px solid var(--nude-accent);">
+                                        {{ doctor.nom|slice(0, 1)|upper }}
+                                    </div>
+                                    <div>
+                                        <span class="d-block fw-bold">Dr. {{ doctor.nom }} {{ doctor.prenom }}</span>
+                                        <small class="text-muted">ID: #00{{ doctor.id }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge-specialty">{{ doctor.specialty.nom|default('Généraliste') }}</span></td>
+                            <td>
+                                <div class="small"><i class="bi bi-envelope me-1"></i> {{ doctor.email }}</div>
+                                <div class="small text-muted"><i class="bi bi-telephone me-1"></i> {{ doctor.phone }}</div>
+                            </td>
+                            <td class="text-end">
+                                {# Bouton Modifier supprimé selon la logique de modération uniquement #}
+                                <form method="post" action="{{ path('admin_doctor_delete', {id: doctor.id}) }}" onsubmit="return confirm('Attention : Cette action supprimera définitivement le compte de ce médecin. Continuer ?');" style="display:inline-block">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ doctor.id) }}">
+                                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                        <i class="bi bi-trash"></i> Supprimer
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5">Aucun médecin n'est encore inscrit dans la base.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-center mt-4">
+                {{ knp_pagination_render(doctors) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

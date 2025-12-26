@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ editMode ? 'Modifier' : 'Ajouter' }} une Spécialité{% endblock %}
+
+{% block body %}
+    <style>
+        :root {
+            --bg-page: #fdfaf8;
+            --text-main: #4a3e36;
+            --color-orange: #f97316;
+            --color-red: #ef4444;
+        }
+
+        body { background-color: var(--bg-page); color: var(--text-main); }
+
+        .form-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(74, 62, 54, 0.05);
+            border: 1px solid rgba(0,0,0,0.02);
+            max-width: 600px;
+            margin: 50px auto;
+        }
+
+        .form-title {
+            font-weight: 800;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(to right, var(--color-red), var(--color-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            padding: 12px 20px;
+            border: 1px solid #eee;
+            background-color: #fdfdfd;
+        }
+
+        .form-control:focus {
+            border-color: var(--color-orange);
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--color-red), var(--color-orange));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-weight: 700;
+            width: 100%;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(249, 115, 22, 0.2);
+            color: white;
+        }
+
+        .btn-back {
+            color: #9a8d82;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <div class="container">
+        <div class="form-card">
+            <a href="{{ path('admin_specialties') }}" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Retour à la liste
+            </a>
+
+            <h2 class="form-title">
+                <i class="bi bi-tags me-2"></i>
+                {{ editMode ? 'Modifier la spécialité' : 'Nouvelle Spécialité' }}
+            </h2>
+
+            {{ form_start(form) }}
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Nom de la spécialité</label>
+                {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Cardiologie, Pédiatrie...'}}) }}
+                <small class="text-danger">{{ form_errors(form.nom) }}</small>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Description</label>
+                {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': '4', 'placeholder': 'Décrivez la spécialité...'}}) }}
+                <small class="text-danger">{{ form_errors(form.description) }}</small>
+            </div>
+
+            <button type="submit" class="btn btn-submit">
+                {{ editMode ? 'Enregistrer les modifications' : 'Créer la spécialité' }}
+            </button>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

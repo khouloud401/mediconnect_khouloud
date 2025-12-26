@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ editMode ? 'Modifier' : 'Ajouter' }} un Médecin - MediConnect{% endblock %}
+
+{% block body %}
+    <style>
+        :root {
+            --nude-bg: #fdfaf7;
+            --nude-accent: #d4a373;
+            --nude-text: #4a3f35;
+        }
+        body { background-color: var(--nude-bg); color: var(--nude-text); }
+
+        .form-card {
+            background: white;
+            border-radius: 25px;
+            border: none;
+            box-shadow: 0 15px 35px rgba(212, 163, 115, 0.1);
+            padding: 40px;
+        }
+
+        .form-control, .form-select {
+            border-radius: 12px;
+            border: 1px solid #eee;
+            padding: 12px;
+            background-color: #fdfdfd;
+        }
+
+        .btn-nude-save {
+            background-color: var(--nude-accent);
+            color: white;
+            border-radius: 12px;
+            padding: 12px 30px;
+            border: none;
+            width: 100%;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .icon-box {
+            width: 60px; height: 60px;
+            background-color: #fdf0e6;
+            color: var(--nude-accent);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px; font-size: 1.5rem;
+        }
+    </style>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="form-card">
+                    <div class="text-center mb-4">
+                        <div class="icon-box"><i class="bi bi-person-badge"></i></div>
+                        <h2 class="fw-bold">{% if editMode %}Modifier Docteur{% else %}Ajouter Docteur{% endif %}</h2>
+                    </div>
+
+                    {{ form_start(form) }}
+                    {{ form_widget(form) }}
+                    <button type="submit" class="btn btn-nude-save mt-4 shadow-sm">
+                        {{ editMode ? 'Mettre à jour' : 'Confirmer l\'ajout' }}
+                    </button>
+                    {{ form_end(form) }}
+
+                    <div class="text-center mt-4">
+                        <a href="{{ path('admin_doctors') }}" class="text-muted small">Retour à la liste</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

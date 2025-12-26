@@ -1,0 +1,181 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Journal d'activités - MediConnect{% endblock %}
+
+{% block body %}
+    <style>
+        :root {
+            --bg-page: #fdfaf8;
+            --card-white: #ffffff;
+            --color-red: #ef4444;
+            --color-orange: #f97316;
+            --color-yellow: #facc15;
+            --text-main: #4a3e36;
+            --text-muted: #9a8d82;
+            --accent-soft: #fdf0e6;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-icon-back {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: white; display: flex; align-items: center;
+            justify-content: center; color: var(--color-orange);
+            border: 1px solid #eee; text-decoration: none; transition: 0.3s;
+        }
+        .btn-icon-back:hover { background: var(--color-orange); color: white; }
+
+        .log-section-card {
+            background: var(--card-white);
+            border-radius: 25px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(74, 62, 54, 0.03);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--bg-page);
+        }
+
+        .section-icon {
+            width: 45px; height: 45px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        /* Couleurs par catégorie */
+        .icon-doctor { background: #fef2f2; color: var(--color-red); }
+        .icon-patient { background: #fff7ed; color: var(--color-orange); }
+        .icon-nurse { background: #fffbeb; color: #b45309; }
+        .icon-admin { background: #f8f9fa; color: var(--text-main); }
+
+        .time-badge {
+            background: var(--accent-soft);
+            color: var(--color-orange);
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 5px 12px;
+            border-radius: 8px;
+        }
+
+        .table thead th {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            border: none;
+        }
+
+        .table tbody td {
+            padding: 15px 0;
+            border-bottom: 1px solid #f1f1f1;
+            font-size: 0.95rem;
+        }
+
+        .admin-email {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+    </style>
+
+    <div class="container mt-5">
+        <div class="d-flex align-items-center justify-content-between mb-5">
+            <a href="{{ path('admin_dashboard') }}" class="btn-icon-back shadow-sm"><i class="bi bi-arrow-left"></i></a>
+            <h1 class="fw-bold m-0" style="color: #1a1a1a;">Journal d'Audit</h1>
+            <div style="width: 42px"></div>
+        </div>
+
+        {# --- SECTION DOCTEURS --- #}
+        <div class="log-section-card">
+            <div class="section-header">
+                <div class="section-icon icon-doctor"><i class="bi bi-person-badge"></i></div>
+                <h4 class="fw-bold m-0">Activités Médecins</h4>
+            </div>
+            {{ _self.render_log_table(logsDoctors) }}
+        </div>
+
+        {# --- SECTION PATIENTS --- #}
+        <div class="log-section-card">
+            <div class="section-header">
+                <div class="section-icon icon-patient"><i class="bi bi-people"></i></div>
+                <h4 class="fw-bold m-0">Activités Patients</h4>
+            </div>
+            {{ _self.render_log_table(logsPatients) }}
+        </div>
+
+        {# --- SECTION INFIRMIERS --- #}
+        <div class="log-section-card">
+            <div class="section-header">
+                <div class="section-icon icon-nurse"><i class="bi bi-heart-pulse"></i></div>
+                <h4 class="fw-bold m-0">Activités Infirmiers</h4>
+            </div>
+            {{ _self.render_log_table(logsNurses) }}
+        </div>
+
+        {# --- SECTION ADMINISTRATION --- #}
+        <div class="log-section-card">
+            <div class="section-header">
+                <div class="section-icon icon-admin"><i class="bi bi-shield-lock"></i></div>
+                <h4 class="fw-bold m-0">Système & Administration</h4>
+            </div>
+            {{ _self.render_log_table(logsAdmin) }}
+        </div>
+
+        <div class="text-center mt-5 mb-5">
+            <p class="text-muted small">© 2024 MediConnect - Système de traçabilité sécurisé</p>
+        </div>
+    </div>
+
+    {# --- MACRO POUR LE TABLEAU --- #}
+    {% macro render_log_table(logs) %}
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                <tr>
+                    <th style="width: 20%;">Date & Heure</th>
+                    <th style="width: 30%;">Responsable</th>
+                    <th style="width: 50%;">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for log in logs %}
+                    <tr>
+                        <td><span class="time-badge">{{ log.createdAt|date('d/m/Y H:i:s') }}</span></td>
+                        <td><span class="admin-email">{{ log.userEmail }}</span></td>
+                        <td class="text-muted">{{ log.action }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center py-4 text-muted italic">Aucun log enregistré dans cette catégorie.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endmacro %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const cards = document.querySelectorAll('.log-section-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = "0";
+                card.style.transform = "translateY(20px)";
+                card.style.transition = "all 0.5s ease-out";
+
+                setTimeout(() => {
+                    card.style.opacity = "1";
+                    card.style.transform = "translateY(0)";
+                }, index * 150); // Délai progressif pour chaque tableau
+            });
+        });
+    </script>
+{% endblock %}

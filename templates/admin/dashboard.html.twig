@@ -1,55 +1,241 @@
 {% extends 'base.html.twig' %}
-{% block title %}Dashboard Admin - MediConnect{% endblock %}
+
+{% block title %}Tableau de Bord - MediConnect{% endblock %}
+
 {% block body %}
-<h1><i class="bi bi-speedometer2"></i> Dashboard Administrateur</h1>
-<div class="row g-4 mt-3">
-    <div class="col-md-3">
-        <div class="card bg-primary text-white">
-            <div class="card-body">
-                <h3>{{ totalDoctors }}</h3>
-                <p>Médecins</p>
+    <style>
+        :root {
+            --bg-page: #fdfaf8;
+            --card-white: #ffffff;
+            --color-red: #ef4444;
+            --color-orange: #f97316;
+            --color-yellow: #facc15;
+            --text-main: #4a3e36;
+            --text-muted: #9a8d82;
+            --accent-soft: #fdf0e6;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .dashboard-container { padding-top: 50px; padding-bottom: 50px; }
+        .main-title {
+            font-weight: 800;
+            font-size: 2.2rem;
+            margin-bottom: 40px;
+            text-align: center;
+            background: linear-gradient(to right, var(--color-red), var(--color-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Architecture Cartes Totales (Nombre + Icone + Action) */
+        .admin-card {
+            background: var(--card-white);
+            border-radius: 28px;
+            padding: 35px 20px;
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.03);
+            box-shadow: 0 10px 30px rgba(74, 62, 54, 0.05);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none !important;
+            display: block;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 22px 45px rgba(249, 115, 22, 0.15);
+        }
+
+        /* Badge du Nombre en haut */
+        .count-badge {
+            font-size: 2.8rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 15px;
+            display: block;
+            letter-spacing: -1px;
+        }
+
+        /* Boîte d'icône centrale */
+        .icon-box {
+            width: 60px; height: 60px; border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px auto; font-size: 1.8rem;
+            transition: 0.3s;
+        }
+
+        .admin-card:hover .icon-box {
+            transform: scale(1.1) rotate(-8deg);
+        }
+
+        .label-text { font-weight: 800; font-size: 1.2rem; color: var(--text-main); display: block; margin-bottom: 5px; }
+        .sub-label { color: var(--text-muted); font-size: 0.85rem; font-weight: 400; }
+
+        /* Variations de couleurs Sunset */
+        .card-red .count-badge, .card-red .icon-box { color: var(--color-red); }
+        .card-red .icon-box { background: #fef2f2; }
+        .card-red:hover { border-color: var(--color-red); }
+
+        .card-orange .count-badge, .card-orange .icon-box { color: var(--color-orange); }
+        .card-orange .icon-box { background: #fff7ed; }
+        .card-orange:hover { border-color: var(--color-orange); }
+
+        .card-yellow .count-badge, .card-yellow .icon-box { color: #b45309; }
+        .card-yellow .icon-box { background: #fffbeb; }
+        .card-yellow:hover { border-color: var(--color-yellow); }
+
+        /* Styles pour les sections Top/Podium */
+        .top-stats-card {
+            background: var(--card-white);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid rgba(0,0,0,0.02);
+            box-shadow: 0 10px 25px rgba(74, 62, 54, 0.03);
+            height: 100%;
+        }
+        .rank-badge {
+            width: 28px; height: 28px; display: inline-flex; align-items: center;
+            justify-content: center; font-size: 0.8rem; font-weight: 800;
+        }
+
+        /* Séparateur de section stylisé */
+        .section-separator {
+            margin: 60px 0 40px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 3px; color: #d6ccc2; font-size: 0.8rem; text-align: center;
+            display: flex; align-items: center; gap: 25px;
+        }
+        .section-separator::before, .section-separator::after { content: ""; flex: 1; height: 2px; background: linear-gradient(to right, transparent, #eee, transparent); }
+    </style>
+
+    <div class="container dashboard-container">
+        <h1 class="main-title">Panel Administration</h1>
+
+        {# --- SECTION : HUMAINS --- #}
+        <div class="section-separator">Utilisateurs & Personnel</div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4 col-lg-3">
+                <a href="{{ path('admin_doctors') }}" class="admin-card card-red">
+                    <span class="count-badge">{{ totalDoctors }}</span>
+                    <div class="icon-box"><i class="bi bi-person-badge"></i></div>
+                    <span class="label-text">Médecins</span>
+                    <span class="sub-label">Gestion de l'équipe</span>
+                </a>
+            </div>
+
+            <div class="col-md-4 col-lg-3">
+                <a href="{{ path('admin_patients') }}" class="admin-card card-orange">
+                    <span class="count-badge">{{ totalPatients }}</span>
+                    <div class="icon-box"><i class="bi bi-people"></i></div>
+                    <span class="label-text">Patients</span>
+                    <span class="sub-label">Dossiers médicaux</span>
+                </a>
+            </div>
+
+            <div class="col-md-4 col-lg-3">
+                <a href="{{ path('admin_nurses') }}" class="admin-card card-yellow">
+                    <span class="count-badge">{{ totalNurses }}</span>
+                    <div class="icon-box"><i class="bi bi-heart-pulse"></i></div>
+                    <span class="label-text">Infirmiers</span>
+                    <span class="sub-label">Staff soignant</span>
+                </a>
             </div>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card bg-success text-white">
-            <div class="card-body">
-                <h3>{{ totalPatients }}</h3>
-                <p>Patients</p>
+
+        {# --- SECTION : LOGISTIQUE --- #}
+        <div class="section-separator">Logistique & Services</div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4 col-lg-3">
+                <a href="{{ path('admin_appointments') }}" class="admin-card card-red">
+                    <span class="count-badge">{{ totalAppointments }}</span>
+                    <div class="icon-box"><i class="bi bi-calendar-check"></i></div>
+                    <span class="label-text">Rendez-vous</span>
+                    <span class="sub-label">Planning et suivi</span>
+                </a>
+            </div>
+
+            <div class="col-md-4 col-lg-3">
+                <a href="{{ path('admin_specialties') }}" class="admin-card card-orange">
+                    <span class="count-badge">{{ totalSpecialties }}</span>
+                    <div class="icon-box"><i class="bi bi-tags"></i></div>
+                    <span class="label-text">Spécialités</span>
+                    <span class="sub-label">Services du centre</span>
+                </a>
+            </div>
+
+            <div class="col-md-4 col-lg-3">
+                <a href="{{ path('admin_reviews') }}" class="admin-card card-yellow">
+                    <span class="count-badge">{{ pendingReviews }}</span>
+                    <div class="icon-box"><i class="bi bi-star"></i></div>
+                    <span class="label-text">Avis</span>
+                    <span class="sub-label">Modération retours</span>
+                </a>
+            </div>
+
+            {# AJOUT CARTE LOGS #}
+            <div class="col-md-4 col-lg-3">
+                <a href="{{ path('admin_logs') }}" class="admin-card card-red">
+                    <span class="count-badge"><i class="bi bi-shield-check"></i></span>
+                    <div class="icon-box"><i class="bi bi-journal-text"></i></div>
+                    <span class="label-text">Journal Logs</span>
+                    <span class="sub-label">Audit du système</span>
+                </a>
             </div>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card bg-info text-white">
-            <div class="card-body">
-                <h3>{{ totalAppointments }}</h3>
-                <p>Rendez-vous</p>
+
+        {# --- SECTION : CLASSEMENTS (TOP STATS) --- #}
+        <div class="section-separator">Performances & Popularité</div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="top-stats-card">
+                    <h5 class="fw-bold mb-4">
+                        <i class="bi bi-trophy text-warning me-2"></i> Top Médecins
+                    </h5>
+                    <ul class="list-group list-group-flush">
+                        {% for item in topDoctors %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center border-0 border-bottom px-0 py-3">
+                                <div>
+                                    <span class="rank-badge badge bg-primary rounded-circle me-3">{{ loop.index }}</span>
+                                    <span class="fw-bold text-main">Dr. {{ item.doctor.nom }}</span>
+                                </div>
+                                <span class="badge bg-light text-dark rounded-pill">{{ item.appCount }} rdv</span>
+                            </li>
+                        {% else %}
+                            <li class="list-group-item text-muted small py-3">Aucune donnée disponible.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card bg-warning text-white">
-            <div class="card-body">
-                <h3>{{ pendingReviews }}</h3>
-                <p>Avis en attente</p>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Actions Rapides</h5>
-                <div class="btn-group" role="group">
-                    <a href="{{ path('admin_doctors') }}" class="btn btn-outline-primary">Gérer les médecins</a>
-                    <a href="{{ path('admin_patients') }}" class="btn btn-outline-success">Gérer les patients</a>
-                    <a href="{{ path('admin_specialties') }}" class="btn btn-outline-info">Gérer les spécialités</a>
-                    <a href="{{ path('admin_appointments') }}" class="btn btn-outline-warning">Gérer les rendez-vous</a>
-                    <a href="{{ path('admin_reviews') }}" class="btn btn-outline-danger">Gérer les avis</a>
+
+            <div class="col-md-6">
+                <div class="top-stats-card">
+                    <h5 class="fw-bold mb-4">
+                        <i class="bi bi-star-fill text-orange me-2"></i> Spécialités Populaires
+                    </h5>
+                    <ul class="list-group list-group-flush">
+                        {% for item in topSpecialties %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center border-0 border-bottom px-0 py-3">
+                                <div>
+                                    <span class="rank-badge badge bg-secondary rounded-circle me-3">{{ loop.index }}</span>
+                                    <span class="fw-bold text-main">{{ item.specialty.nom }}</span>
+                                </div>
+                                <span class="badge bg-light text-dark rounded-pill">{{ item.doctorCount }} médecins</span>
+                            </li>
+                        {% else %}
+                            <li class="list-group-item text-muted small py-3">Aucune donnée disponible.</li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}
