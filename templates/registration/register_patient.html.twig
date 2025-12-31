@@ -1,28 +1,164 @@
 {% extends 'base.html.twig' %}
+
 {% block title %}Inscription Patient - MediConnect{% endblock %}
+
 {% block body %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-body p-5">
-                <h2 class="text-center mb-4">Inscription Patient</h2>
-                {{ form_start(registrationForm) }}
-                <div class="row">
-                    <div class="col-md-6 mb-3">{{ form_row(registrationForm.nom) }}</div>
-                    <div class="col-md-6 mb-3">{{ form_row(registrationForm.prenom) }}</div>
-                </div>
-                <div class="mb-3">{{ form_row(registrationForm.email) }}</div>
-                <div class="mb-3">{{ form_row(registrationForm.phone) }}</div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">{{ form_row(registrationForm.ville) }}</div>
-                    <div class="col-md-6 mb-3">{{ form_row(registrationForm.adresse) }}</div>
-                </div>
-                <div class="mb-3">{{ form_row(registrationForm.plainPassword.first) }}</div>
-                <div class="mb-3">{{ form_row(registrationForm.plainPassword.second) }}</div>
-                <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
-                {{ form_end(registrationForm) }}
+    <style>
+        :root {
+            --sky-blue: #00d4ff;
+            --pistachio-green: #b2ec5d;
+            --deep-blue: #0076cc;
+        }
+
+        body {
+            background: url("{{ asset('images/photo3.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10%;
+            padding-left: 20px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .back-arrow {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            color: white;
+            font-size: 2.5rem;
+            text-decoration: none;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+            transition: 0.3s;
+            z-index: 1000;
+        }
+
+        .back-arrow:hover {
+            color: var(--sky-blue);
+            transform: scale(1.1);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            width: 100%;
+            max-width: 550px;
+        }
+
+        .btn-register {
+            background: linear-gradient(45deg, var(--sky-blue), var(--deep-blue));
+            border: none;
+            color: white;
+            font-weight: 800;
+            padding: 12px;
+            border-radius: 15px;
+            width: 100%;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid #eee;
+            background: #fdfdfd;
+        }
+
+        .form-control:focus {
+            border-color: var(--sky-blue);
+            box-shadow: 0 0 0 0.2rem rgba(0, 212, 255, 0.1);
+        }
+
+        .form-label {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #444;
+            margin-bottom: 5px;
+        }
+
+        footer, .footer {
+            display: none !important;
+        }
+    </style>
+
+    <div class="main-content">
+        <a href="{{ path('app_register') }}" class="back-arrow">
+            <i class="bi bi-arrow-left-circle-fill"></i>
+        </a>
+
+        <div class="glass-card">
+            <div class="text-center mb-4">
+                <i class="bi bi-person-plus-fill fs-1" style="color: var(--sky-blue);"></i>
+                <h2 class="fw-bold m-0" style="color: #2c3e50;">Espace Patient</h2>
+                <p class="text-muted small">Créez votre compte MediConnect</p>
+                <hr style="width: 40px; border: 2px solid var(--pistachio-green); margin: 8px auto;">
             </div>
+
+            {{ form_start(registrationForm) }}
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    {{ form_label(registrationForm.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control'}}) }}
+                </div>
+                <div class="col-md-6 mb-2">
+                    {{ form_label(registrationForm.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+
+            <div class="mb-2">
+                {{ form_label(registrationForm.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="mb-2">
+                {{ form_label(registrationForm.phone, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.phone, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    {{ form_label(registrationForm.ville, 'Ville', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.ville, {'attr': {'class': 'form-control'}}) }}
+                </div>
+                <div class="col-md-6 mb-2">
+                    {{ form_label(registrationForm.adresse, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.adresse, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+
+            <div class="mb-2">
+                {{ form_label(registrationForm.plainPassword.first, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="mb-4">
+                {{ form_label(registrationForm.plainPassword.second, 'Confirmer le mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <button type="submit" class="btn btn-register shadow">Créer mon compte patient</button>
+            {{ form_end(registrationForm) }}
         </div>
     </div>
-</div>
 {% endblock %}

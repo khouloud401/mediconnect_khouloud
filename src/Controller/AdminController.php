@@ -34,7 +34,7 @@ class AdminController extends AbstractController
             'totalSpecialties' => $specialtyRepo->count([]),
             'pendingReviews' => $rr->count(['isApproved' => false]),
             'recentAppointments' => $ar->findBy([], ['id' => 'DESC'], 10),
-            'topDoctors' => $dr->findTopDoctors(3),
+            'topDoctors' => $dr->findTopRatedDoctors(3),
             'topSpecialties' => $specialtyRepo->findTopSpecialties(3),
         ]);
     }

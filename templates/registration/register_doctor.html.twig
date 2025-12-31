@@ -3,82 +3,186 @@
 {% block title %}Inscription Médecin - MediConnect{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow">
-                    <div class="card-body p-5">
-                        <h2 class="text-center mb-4">Inscription Médecin</h2>
+    <style>
+        :root {
+            --primary-blue: #007bff;
+            --success-green: #28a745;
+            --pistachio-green: #93c572;
+            --royal-violet: #6a0dad;
+        }
 
-                        {{ form_start(registrationForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
+        /* Arrière-plan complet */
+        body {
+            background: url("{{ asset('images/image6.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                {{ form_label(registrationForm.nom) }}
-                                {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control'}}) }}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                {{ form_label(registrationForm.prenom) }}
-                                {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control'}}) }}
-                            </div>
-                        </div>
+        /* Déplacement vers la droite */
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 5%;
+            padding-left: 20px;
+            position: relative;
+        }
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                {{ form_label(registrationForm.email) }}
-                                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                {{ form_label(registrationForm.phone) }}
-                                {{ form_widget(registrationForm.phone, {'attr': {'class': 'form-control'}}) }}
-                            </div>
-                        </div>
+        /* Flèche de retour simple */
+        .back-arrow {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            color: white;
+            font-size: 2.2rem;
+            text-decoration: none;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
 
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                {{ form_label(registrationForm.ville) }}
-                                {{ form_widget(registrationForm.ville, {'attr': {'class': 'form-control'}}) }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                {{ form_label(registrationForm.specialty) }}
-                                {{ form_widget(registrationForm.specialty, {'attr': {'class': 'form-control'}}) }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                {{ form_label(registrationForm.diploma) }}
-                                {{ form_widget(registrationForm.diploma, {'attr': {'class': 'form-control'}}) }}
-                            </div>
-                        </div>
+        .back-arrow:hover {
+            color: var(--pistachio-green);
+            transform: scale(1.1);
+        }
 
-                        <div class="mb-3">
-                            {{ form_label(registrationForm.experience) }}
-                            {{ form_widget(registrationForm.experience, {'attr': {'class': 'form-control'}}) }}
-                        </div>
+        /* Carte blanche ajustée à droite */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            padding: 20px 25px;
+            width: 100%;
+            max-width: 550px;
+        }
 
-                        <div class="mb-3">
-                            {{ form_label(registrationForm.description) }}
-                            {{ form_widget(registrationForm.description, {'attr': {'class': 'form-control', 'rows': '3'}}) }}
-                        </div>
+        /* Style bouton choisir un fichier (sans texte "aucun fichier") */
+        input[type="file"] {
+            color: transparent;
+        }
+        input[type="file"]::file-selector-button {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: 0.3s;
+        }
+        input[type="file"]::file-selector-button:hover {
+            background: var(--royal-violet);
+        }
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                {{ form_label(registrationForm.plainPassword.first) }}
-                                {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                {{ form_label(registrationForm.plainPassword.second) }}
-                                {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
-                            </div>
-                        </div>
+        .btn-success-custom {
+            background: linear-gradient(45deg, var(--success-green), var(--pistachio-green));
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            transition: 0.3s;
+        }
 
-                        <button type="submit" class="btn btn-success w-100 mt-4">S'inscrire</button>
+        .form-control {
+            border-radius: 6px;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            font-size: 0.9rem;
+        }
 
-                        {{ form_end(registrationForm) }}
+        .form-label {
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+            color: #333;
+        }
 
-                        <div class="text-center mt-3">
-                            <p>Déjà un compte ? <a href="{{ path('app_login') }}">Connectez-vous</a></p>
-                        </div>
-                    </div>
+        footer { display: none !important; }
+    </style>
+
+    <div class="main-content">
+        <a href="{{ path('app_register') }}" class="back-arrow">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+
+        <div class="glass-card">
+            <div class="text-center mb-3">
+                <h2 class="fw-bold m-0" style="color: var(--success-green);">Inscription Médecin</h2>
+                <hr style="width: 40px; border: 2px solid var(--pistachio-green); margin: 6px auto;">
+            </div>
+
+            {{ form_start(registrationForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    {{ form_label(registrationForm.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.nom) }}
                 </div>
+                <div class="col-md-6 mb-2">
+                    {{ form_label(registrationForm.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.prenom) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    {{ form_label(registrationForm.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.email) }}
+                </div>
+                <div class="col-md-6 mb-2">
+                    {{ form_label(registrationForm.phone, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.phone) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-2">
+                    {{ form_label(registrationForm.ville, 'Ville', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.ville) }}
+                </div>
+                <div class="col-md-4 mb-2">
+                    {{ form_label(registrationForm.specialty, 'Spécialité', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.specialty) }}
+                </div>
+                <div class="col-md-4 mb-2">
+                    {{ form_label(registrationForm.diploma, 'Diplôme (PDF)', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.diploma) }}
+                </div>
+            </div>
+
+            {# Champ Expérience déplacé ici après le diplôme #}
+            <div class="mb-2">
+                {{ form_label(registrationForm.experience, "Années d'expérience", {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.experience) }}
+            </div>
+
+            <div class="mb-2">
+                {{ form_label(registrationForm.description, 'Description / Présentation', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.description, {'attr': {'rows': '2'}}) }}
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form_label(registrationForm.plainPassword.first, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.plainPassword.first) }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form_label(registrationForm.plainPassword.second, 'Confirmation', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.plainPassword.second) }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success-custom shadow-sm">S'inscrire comme médecin</button>
+            {{ form_end(registrationForm) }}
+
+            <div class="text-center mt-2">
+                <p class="mb-0 small">Déjà inscrit ? <a href="{{ path('app_login') }}" style="color: var(--success-green); font-weight: bold; text-decoration: none;">Se connecter</a></p>
             </div>
         </div>
     </div>

@@ -1,59 +1,249 @@
 {% extends 'base.html.twig' %}
-{% block title %}Mon Espace Patient - MediConnect{% endblock %}
+
+{% block title %}Espace Patient - MediConnect{% endblock %}
+
 {% block body %}
-<h1><i class="bi bi-speedometer2"></i> Mon Espace Patient</h1>
-<div class="row g-4 mt-3">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-calendar-check"></i> Mes Prochains Rendez-vous</h5>
-                {% if appointments is empty %}
-                    <p class="text-muted">Aucun rendez-vous pour le moment.</p>
-                {% else %}
-                    <div class="list-group">
-                        {% for appointment in appointments %}
-                        <div class="list-group-item">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <strong>Dr. {{ appointment.doctor.fullName }}</strong><br>
-                                    <small>{{ appointment.dateTime|date('d/m/Y à H:i') }}</small><br>
-                                    <span class="badge bg-{{ appointment.statusBadgeClass }}">{{ appointment.statusLabel }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-                <a href="{{ path('patient_appointments') }}" class="btn btn-primary mt-3">Voir tous mes rendez-vous</a>
+    <style>
+        :root {
+            --accent-color: #4facfe;
+            --glass-white: rgba(255, 255, 255, 0.85);
+            --text-dark: #1e293b;
+        }
+
+        body {
+            background: url("{{ asset('images/image8.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+        }
+
+        .dashboard-wrapper {
+            padding: 40px 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top right, rgba(79, 172, 254, 0.1), transparent);
+        }
+
+        /* En-tête avec Icône de profil */
+        .welcome-section {
+            margin-bottom: 35px;
+            color: white;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--glass-white);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .welcome-section h1 {
+            font-weight: 800;
+            font-size: 2.2rem;
+            margin: 0;
+        }
+
+        /* Bento Grid Style */
+        .bento-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 24px;
+            padding: 30px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .card-label {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(79, 172, 254, 0.15);
+            color: var(--accent-color);
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        /* Planning diminué */
+        .apt-container {
+            flex-grow: 1;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .apt-pill {
+            background: white;
+            border-radius: 15px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .apt-icon {
+            width: 35px;
+            height: 35px;
+            background: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        /* Actions Rapides */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            flex-grow: 1;
+        }
+
+        .action-item {
+            background: white;
+            padding: 25px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: 0.3s;
+            border: 1px solid transparent;
+            text-align: center;
+        }
+
+        .action-item i { font-size: 1.8rem; color: var(--accent-color); }
+        .action-item span { font-weight: 600; font-size: 0.9rem; }
+
+        .action-item:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+            color: var(--accent-color);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        /* Bouton Consulter mes rendez-vous */
+        .btn-modern-footer {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 16px;
+            width: 100%;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+            transition: 0.3s;
+            margin-top: auto;
+        }
+
+        .btn-modern-footer:hover {
+            filter: brightness(1.1);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        footer { display: none !important; }
+    </style>
+
+    <div class="dashboard-wrapper">
+        <div class="container">
+
+            <div class="welcome-section">
+                <div class="profile-avatar shadow-lg">
+                    <i class="bi bi-person-circle"></i>
+                </div>
+                <div>
+                    <h1>Bienvenue dans votre compte</h1>
+                    <p class="fs-5 m-0 opacity-75">Gérez votre santé en toute simplicité.</p>
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-search"></i> Actions Rapides</h5>
-                <div class="d-grid gap-2">
-                    <a href="{{ path('patient_search_doctors') }}" class="btn btn-outline-primary">
-                        <i class="bi bi-search"></i> Rechercher un médecin
-                    </a>
-                    <a href="{{ path('patient_appointments') }}" class="btn btn-outline-secondary">
-                        <i class="bi bi-calendar"></i> Mes rendez-vous
-                    </a>
 
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="bento-card">
+                        <span class="card-label">Planning</span>
+                        <h4 class="fw-bold mb-3">Mes consultations</h4>
 
-                    {# Mes ordonnances #}
-                    <a href="{{ path('patient_prescriptions') }}" class="btn btn-outline-secondary btn-lg w-100 mb-2">
-                        <i class="bi bi-file-earmark-medical"></i> Mes ordonnances
-                    </a>
+                        <div class="apt-container">
+                            {% if appointments is empty %}
+                                <p class="text-muted py-4 small text-center">Aucun rendez-vous prévu pour le moment.</p>
+                            {% else %}
+                                {% for appointment in appointments %}
+                                    <div class="apt-pill shadow-sm">
+                                        <div class="apt-icon">
+                                            <i class="bi bi-calendar3"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="fw-bold small">Dr. {{ appointment.doctor.fullName }}</div>
+                                            <div class="text-muted" style="font-size: 0.75rem;">{{ appointment.dateTime|date('d/m/Y à H:i') }}</div>
+                                        </div>
+                                        <span class="badge bg-light text-primary border" style="font-size: 0.65rem;">{{ appointment.statusLabel }}</span>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
 
-                    {# Mes avis #}
-                    <a href="{{ path('patient_reviews') }}" class="btn btn-outline-secondary btn-lg w-100">
-                        <i class="bi bi-star"></i> Mes avis
-                    </a>
+                        <a href="{{ path('patient_appointments') }}" class="btn-modern-footer">
+                            Consulter mes rendez-vous
+                        </a>
+                    </div>
+                </div>
 
+                <div class="col-lg-6">
+                    <div class="bento-card">
+                        <span class="card-label">Services</span>
+                        <h4 class="fw-bold mb-4">Actions rapides</h4>
+
+                        <div class="action-grid">
+                            <a href="{{ path('patient_search_doctors') }}" class="action-item shadow-sm">
+                                <i class="bi bi-search-heart"></i>
+                                <span>Trouver un médecin</span>
+                            </a>
+
+                            <a href="{{ path('patient_appointments') }}" class="action-item shadow-sm">
+                                <i class="bi bi-calendar-check"></i>
+                                <span>Mes visites</span>
+                            </a>
+
+                            <a href="{{ path('patient_prescriptions') }}" class="action-item shadow-sm">
+                                <i class="bi bi-file-medical"></i>
+                                <span>Ordonnances</span>
+                            </a>
+
+                            <a href="{{ path('patient_reviews') }}" class="action-item shadow-sm">
+                                <i class="bi bi-chat-left-heart"></i>
+                                <span>Laisser un avis</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

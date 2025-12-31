@@ -41,7 +41,7 @@ class DoctorRepository extends ServiceEntityRepository
     }
 
 
-    public function findTopDoctors(int $limit = 10): array
+    public function findTopRatedDoctors(int $limit = 10): array
     {
         return $this->createQueryBuilder('d')
             ->leftJoin('d.appointments', 'a')

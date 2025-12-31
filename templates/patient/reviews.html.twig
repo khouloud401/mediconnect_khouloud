@@ -1,36 +1,179 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes avis{% endblock %}
+{% block title %}Mes avis - MediConnect{% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
-        <h1>Mes avis sur les médecins</h1>
+    <style>
+        :root {
+            --accent-color: #4facfe;
+            --glass-white: rgba(255, 255, 255, 0.9);
+            --text-dark: #1e293b;
+            --star-color: #ffc107;
+        }
 
-        {% if reviews|length > 0 %}
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th>Médecin</th>
-                    <th>Note</th>
-                    <th>Commentaire</th>
-                    <th>Date</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for review in reviews %}
-                    <tr>
-                        <td>{{ review.doctor.fullName }}</td>
-                        <td>{{ review.rating }}/5</td>
-                        <td>{{ review.comment }}</td>
-                        <td>{{ review.createdAt|date('d/m/Y H:i') }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+        body {
+            background: url("{{ asset('images/image8.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+        }
 
-            {{ knp_pagination_render(reviews) }}
-        {% else %}
-            <p>Vous n'avez pas encore laissé d'avis.</p>
-        {% endif %}
+        .dashboard-wrapper {
+            padding: 40px 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top right, rgba(79, 172, 254, 0.1), transparent);
+        }
+
+        /* Header Section */
+        .welcome-section {
+            margin-bottom: 35px;
+            color: white;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--glass-white);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Cartes d'avis */
+        .review-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: 0.3s ease;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .doctor-name {
+            color: var(--accent-color);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .star-rating {
+            color: var(--star-color);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .review-date {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .comment-text {
+            font-style: italic;
+            color: #334155;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 10px;
+        }
+
+        /* Flèche retour */
+        .back-arrow {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            color: white;
+            font-size: 2rem;
+            z-index: 1000;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            transition: 0.3s;
+        }
+
+        .back-arrow:hover {
+            color: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            background: var(--glass-white);
+            padding: 50px;
+            border-radius: 24px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        footer { display: none !important; }
+    </style>
+
+    <a href="{{ path('patient_dashboard') }}" class="back-arrow">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+
+    <div class="dashboard-wrapper">
+        <div class="container">
+
+            <div class="welcome-section">
+                <div class="profile-avatar shadow-lg">
+                    <i class="bi bi-chat-quote"></i>
+                </div>
+                <div>
+                    <h1>Mes avis</h1>
+                    <p class="fs-5 m-0 opacity-75">Retrouvez tous les retours que vous avez partagés.</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-10">
+                    {% if reviews|length > 0 %}
+                        {% for review in reviews %}
+                            <div class="review-card">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <div class="doctor-name">Dr. {{ review.doctor.fullName }}</div>
+                                        <div class="review-date">Posté le {{ review.createdAt|date('d/m/Y') }}</div>
+                                    </div>
+                                    <div class="star-rating">
+                                        {% for i in 1..5 %}
+                                            <i class="bi bi-star{{ i <= review.rating ? '-fill' : '' }}"></i>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="comment-text">
+                                    "{{ review.comment|default('Aucun commentaire laissé.') }}"
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        <div class="mt-4">
+                            {{ knp_pagination_render(reviews) }}
+                        </div>
+
+                    {% else %}
+                        <div class="empty-state shadow-sm">
+                            <i class="bi bi-chat-dots mb-3" style="font-size: 3rem; opacity: 0.5;"></i>
+                            <p class="m-0">Vous n'avez pas encore laissé d'avis sur vos consultations.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
     </div>
 {% endblock %}

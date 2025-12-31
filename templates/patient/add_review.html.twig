@@ -1,9 +1,197 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Donner mon avis - Dr. {{ appointment.doctor.fullName }}{% endblock %}
+
 {% block body %}
-    <h1>Donner mon avis sur Dr {{ appointment.doctor.nom }}</h1>
-    {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn btn-primary">Envoyer</button>
-    {{ form_end(form) }}
+    <style>
+        :root {
+            --accent-color: #4facfe;
+            --glass-white: rgba(255, 255, 255, 0.9);
+            --text-dark: #1e293b;
+            --star-color: #ffc107;
+        }
+
+        body {
+            background: url("{{ asset('images/image8.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+        }
+
+        .dashboard-wrapper {
+            padding: 40px 0;
+            min-height: 100vh;
+        }
+
+        /* En-tête centré également pour la cohérence */
+        .welcome-section {
+            margin-bottom: 35px;
+            color: white;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 15px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--glass-white);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .welcome-section h1 {
+            font-weight: 800;
+            font-size: 2.2rem;
+            margin: 0;
+        }
+
+        /* Carte Bento centrée */
+        .bento-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Système d'étoiles centré */
+        .rating-stars {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .rating-stars input { display: none; }
+
+        .rating-stars label {
+            font-size: 2.8rem;
+            color: #ccc;
+            cursor: pointer;
+            transition: 0.2s ease-in-out;
+        }
+
+        .rating-stars label:hover,
+        .rating-stars label:hover ~ label,
+        .rating-stars input:checked ~ label {
+            color: var(--star-color);
+            transform: scale(1.1);
+        }
+
+        .form-label { font-weight: 600; margin-bottom: 10px; display: block; text-align: center; }
+
+        .form-control {
+            border-radius: 15px;
+            padding: 12px 18px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+            background: white;
+        }
+
+        .btn-modern-footer {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 16px;
+            width: 100%;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .btn-modern-footer:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        .back-arrow {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            color: white;
+            font-size: 2rem;
+            z-index: 1000;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        footer { display: none !important; }
+    </style>
+
+    <a href="{{ path('patient_appointments') }}" class="back-arrow">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+
+    <div class="dashboard-wrapper">
+        <div class="container">
+
+            <div class="welcome-section">
+                <div class="profile-avatar shadow-lg">
+                    <i class="bi bi-chat-left-heart"></i>
+                </div>
+                <div>
+                    <h1>Votre avis</h1>
+                    <p class="fs-5 m-0 opacity-75">Partagez votre expérience avec Dr. {{ appointment.doctor.fullName }}</p>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-7">
+                    <div class="bento-card">
+                        <h4 class="fw-bold mb-4 text-center">Évaluez votre consultation</h4>
+
+                        {{ form_start(form) }}
+
+                        <label class="form-label">Note globale</label>
+                        <div class="rating-stars">
+                            <input type="radio" id="star5" name="{{ form.rating.vars.full_name }}" value="5" />
+                            <label for="star5" class="bi bi-star-fill"></label>
+
+                            <input type="radio" id="star4" name="{{ form.rating.vars.full_name }}" value="4" />
+                            <label for="star4" class="bi bi-star-fill"></label>
+
+                            <input type="radio" id="star3" name="{{ form.rating.vars.full_name }}" value="3" />
+                            <label for="star3" class="bi bi-star-fill"></label>
+
+                            <input type="radio" id="star2" name="{{ form.rating.vars.full_name }}" value="2" />
+                            <label for="star2" class="bi bi-star-fill"></label>
+
+                            <input type="radio" id="star1" name="{{ form.rating.vars.full_name }}" value="1" />
+                            <label for="star1" class="bi bi-star-fill"></label>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" style="text-align: left;">Votre commentaire</label>
+                            {{ form_widget(form.comment, {'attr': {'class': 'form-control', 'rows': '5', 'placeholder': 'Comment s\'est passée votre visite ?'}}) }}
+                        </div>
+
+                        {% do form.rating.setRendered %}
+
+                        <button type="submit" class="btn-modern-footer">
+                            Envoyer mon avis
+                        </button>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

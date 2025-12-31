@@ -1,67 +1,204 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier Profil{% endblock %}
+{% block title %}Modifier mon Profil - MediConnect{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="card-title mb-0"><i class="fas fa-user-edit me-2"></i>Mes Informations Personnelles</h3>
-                    </div>
-                    <div class="card-body">
+    <style>
+        :root {
+            --violet-primary: #8e44ad;
+            --violet-deep: #6c3483;
+            --violet-light: #f4eef8;
+            --glass-white: rgba(255, 255, 255, 0.95);
+        }
+
+        body {
+            background: url("{{ asset('images/image1.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .dashboard-wrapper {
+            padding: 60px 0;
+            min-height: 100vh;
+            background: rgba(0, 0, 0, 0.3); /* Overlay pour lisibilité */
+        }
+
+        /* Flèche Retour */
+        .back-arrow {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            color: white;
+            font-size: 2rem;
+            z-index: 1000;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            transition: 0.3s;
+        }
+
+        .back-arrow:hover {
+            color: var(--violet-primary);
+            transform: scale(1.1);
+        }
+
+        /* Carte Bento Formulaire */
+        .bento-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .form-title {
+            color: var(--violet-deep);
+            font-weight: 800;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #4a4a4a;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .form-control:focus {
+            border-color: var(--violet-primary);
+            box-shadow: 0 0 0 4px rgba(142, 68, 173, 0.1);
+        }
+
+        .btn-save {
+            background: var(--violet-primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-weight: 700;
+            width: 100%;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(142, 68, 173, 0.2);
+        }
+
+        .btn-save:hover {
+            background: var(--violet-deep);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-cancel {
+            background: #e0e0e0;
+            color: #666;
+            border-radius: 15px;
+            padding: 15px 30px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background: #d0d0d0;
+            color: #333;
+        }
+
+        footer { display: none !important; }
+    </style>
+
+    <a href="{{ path('app_nurse_index') }}" class="back-arrow">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+
+    <div class="dashboard-wrapper">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+
+                    <div class="bento-card">
+                        <h2 class="form-title">Modifier mes informations</h2>
+
                         {{ form_start(form) }}
+
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                {{ form_label(form.prenom, 'Prénom') }}
-                                {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
+                            <div class="col-md-6">
+                                {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.prenom, {'attr': {'class': 'form-control', 'placeholder': 'Votre prénom'}}) }}
                             </div>
-                            <div class="col-md-6 mb-3">
-                                {{ form_label(form.name, 'Nom') }}
-                                {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+                            <div class="col-md-6">
+                                {{ form_label(form.name, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.name, {'attr': {'class': 'form-control', 'placeholder': 'Votre nom'}}) }}
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            {{ form_label(form.email, 'Adresse Email') }}
+                            {{ form_label(form.email, 'Adresse Email', {'label_attr': {'class': 'form-label'}}) }}
                             {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                {{ form_label(form.phone, 'Téléphone') }}
+                            <div class="col-md-6">
+                                {{ form_label(form.phone, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
                                 {{ form_widget(form.phone, {'attr': {'class': 'form-control'}}) }}
                             </div>
-                            <div class="col-md-6 mb-3">
-                                {{ form_label(form.ville, 'Ville') }}
+                            <div class="col-md-6">
+                                {{ form_label(form.ville, 'Ville', {'label_attr': {'class': 'form-label'}}) }}
                                 {{ form_widget(form.ville, {'attr': {'class': 'form-control'}}) }}
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                {{ form_label(form.experience, 'Années d\'expérience') }}
+                            <div class="col-md-4">
+                                {{ form_label(form.experience, 'Expérience (Années)', {'label_attr': {'class': 'form-label'}}) }}
                                 {{ form_widget(form.experience, {'attr': {'class': 'form-control'}}) }}
                             </div>
-                            <div class="col-md-6 mb-3">
-                                {{ form_label(form.genre, 'Genre') }}
+                            <div class="col-md-4">
+                                {{ form_label(form.shift, 'Équipe (Shift)', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.shift, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form_label(form.teamNumber, 'N° d\'équipe', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.teamNumber, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                {{ form_label(form.genre, 'Genre', {'label_attr': {'class': 'form-label'}}) }}
                                 {{ form_widget(form.genre, {'attr': {'class': 'form-control'}}) }}
                             </div>
                         </div>
 
-                        <hr>
+                        <hr class="my-4">
 
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ path('app_nurse_index') }}" class="btn btn-secondary">
-                                <i class="fas fa-times me-1"></i> Annuler
-                            </a>
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-save me-1"></i> Enregistrer les changements
-                            </button>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <a href="{{ path('app_nurse_index') }}" class="btn-cancel">
+                                    <i class="bi bi-x-circle me-1"></i> Annuler
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="submit" class="btn-save">
+                                    <i class="bi bi-check-circle me-1"></i> Enregistrer
+                                </button>
+                            </div>
                         </div>
                         {{ form_end(form) }}
                     </div>
+
                 </div>
             </div>
         </div>

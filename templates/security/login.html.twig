@@ -3,37 +3,154 @@
 {% block title %}Connexion - MediConnect{% endblock %}
 
 {% block body %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-body p-5">
-                <h2 class="text-center mb-4"><i class="bi bi-box-arrow-in-right"></i> Connexion</h2>
-                
-                {% if error %}
-                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-                {% endif %}
+    <style>
+        :root {
+            --sky-blue: #00d4ff;
+            --pistachio-green: #b2ec5d;
+            --deep-blue: #0076cc;
+        }
 
-                <form method="post">
-                    <div class="mb-3">
-                        <label for="inputEmail" class="form-label">Email</label>
-                        <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" class="form-control" required autofocus>
-                    </div>
+        /* Arrière-plan avec photo2.jpg */
+        body {
+            background: url("{{ asset('images/photo2.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-                    <div class="mb-3">
-                        <label for="inputPassword" class="form-label">Mot de passe</label>
-                        <input type="password" name="_password" id="inputPassword" class="form-control" required>
-                    </div>
+        /* Conteneur principal - Aligné à DROITE maintenant */
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* Déplace le contenu vers la droite */
+            padding-right: 8%; /* Marge par rapport au bord droit */
+            padding-left: 20px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.05); /* Overlay très léger */
+        }
 
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+        /* Flèche de retour */
+        .back-arrow {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            color: white;
+            font-size: 2.5rem;
+            text-decoration: none;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+            transition: 0.3s;
+            z-index: 1000;
+        }
 
-                    <button class="btn btn-primary w-100 mb-3" type="submit">Se connecter</button>
-                </form>
+        .back-arrow:hover {
+            color: var(--sky-blue);
+            transform: scale(1.1);
+        }
 
-                <div class="text-center">
-                    <p>Pas encore de compte ? <a href="{{ path('app_register') }}">S'inscrire</a></p>
+        /* Bloc de connexion Bento */
+        .login-box {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Bouton avec dégradé Bleu Ciel & Vert Pistache */
+        .btn-custom {
+            background: linear-gradient(45deg, var(--sky-blue), var(--pistachio-green));
+            border: none;
+            color: #2c3e50;
+            font-weight: 800;
+            padding: 14px;
+            border-radius: 15px;
+            width: 100%;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            color: #000;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            padding: 12px 15px;
+            border: 1px solid #eee;
+            background: #f8f9fa;
+        }
+
+        .form-control:focus {
+            border-color: var(--sky-blue);
+            box-shadow: 0 0 0 0.25rem rgba(0, 212, 255, 0.1);
+        }
+
+        .text-link {
+            color: var(--deep-blue);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .text-link:hover {
+            text-decoration: underline;
+        }
+
+        footer, .footer {
+            display: none !important;
+        }
+    </style>
+
+    <div class="main-content">
+        <a href="{{ path('app_home') }}" class="back-arrow">
+            <i class="bi bi-arrow-left-circle-fill"></i>
+        </a>
+
+        <div class="login-box">
+            <div class="text-center mb-4">
+                <div class="mb-2" style="display: inline-block; padding: 15px; background: rgba(0, 212, 255, 0.1); border-radius: 50%;">
+                    <i class="bi bi-shield-lock-fill fs-1" style="color: var(--sky-blue);"></i>
                 </div>
+                <h2 class="fw-bold m-0" style="color: #2c3e50;">Connexion</h2>
+                <p class="text-muted small">Espace sécurisé MediConnect</p>
+            </div>
+
+            {% if error %}
+                <div class="alert alert-danger border-0 rounded-3 small shadow-sm">
+                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
+
+            <form method="post">
+                <div class="mb-3">
+                    <label for="inputEmail" class="form-label small fw-bold" style="color: #555;">Email Professionnel / Patient</label>
+                    <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" class="form-control" placeholder="nom@exemple.com" required autofocus>
+                </div>
+
+                <div class="mb-4">
+                    <label for="inputPassword" class="form-label small fw-bold" style="color: #555;">Mot de passe</label>
+                    <input type="password" name="_password" id="inputPassword" class="form-control" placeholder="••••••••" required>
+                </div>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <button class="btn btn-custom shadow" type="submit">
+                    Entrer dans mon espace
+                </button>
+            </form>
+
+            <div class="text-center mt-4 pt-2 border-top">
+                <p class="mb-0 small text-muted">Pas encore membre ? <a href="{{ path('app_register') }}" class="text-link">Inscrivez-vous ici</a></p>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

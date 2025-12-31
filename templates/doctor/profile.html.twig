@@ -1,26 +1,154 @@
-{# templates/doctor/profile.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon profil{% endblock %}
+{% block title %}Mon Profil - MediConnect{% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
-        <h1>Mon profil</h1>
+    <style>
+        :root {
+            --pistachio-green: #93c47d;
+            --deep-green: #38761d;
+            --glass-white: rgba(255, 255, 255, 0.95);
+        }
 
-        {# messages flash de succès #}
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success">
-                {{ message }}
+        body {
+            background: url("{{ asset('images/image10.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .dashboard-wrapper {
+            padding: 60px 0;
+            min-height: 100vh;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .back-arrow {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            color: white;
+            font-size: 2.5rem;
+            z-index: 1000;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            transition: 0.3s;
+        }
+
+        .back-arrow:hover { color: var(--pistachio-green); transform: scale(1.1); }
+
+        /* Grand Cercle Avatar cliquable */
+        .doctor-avatar-container {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            margin: -90px auto 20px;
+            padding: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+            background: linear-gradient(135deg, var(--pistachio-green), var(--deep-green));
+            cursor: pointer; /* Indique que c'est cliquable */
+            transition: 0.3s;
+        }
+
+        .doctor-avatar-container:hover { transform: scale(1.05); }
+
+        .doctor-avatar-container img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+        }
+
+        /* Masquer l'input de fichier réel */
+        input[type="file"] {
+            display: none !important;
+        }
+
+        .bento-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            margin-top: 100px;
+        }
+
+        .form-title { color: var(--deep-green); font-weight: 800; text-align: center; margin-bottom: 30px; }
+
+        .form-control { border-radius: 12px; padding: 12px; border: 1px solid #ddd; margin-bottom: 15px; }
+
+        .btn-save {
+            background: var(--deep-green);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 15px;
+            font-weight: 700;
+            width: 100%;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        footer { display: none !important; }
+    </style>
+
+    <a href="{{ path('doctor_dashboard') }}" class="back-arrow">
+        <i class="bi bi-arrow-left-circle-fill"></i>
+    </a>
+
+    <div class="dashboard-wrapper">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-7">
+                    <div class="bento-card">
+
+                        {# Le clic ici déclenche l'input caché #}
+                        <div class="doctor-avatar-container" onclick="document.querySelector('input[type=file]').click();">
+                            <img id="avatar-preview" src="https://ui-avatars.com/api/?name={{ app.user.fullName|default('Doctor') }}&background=fff&color=38761d&size=200" alt="Avatar">
+                        </div>
+
+                        <h2 class="form-title">Mes Informations</h2>
+
+                        {% for message in app.flashes('success') %}
+                            <div class="alert alert-success rounded-pill text-center border-0 shadow-sm mb-4">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+
+                        {{ form_start(form) }}
+                        <div class="row">
+                            <div class="col-12 profile-form-widgets">
+                                {{ form_widget(form) }}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-save mt-4">Enregistrer</button>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
             </div>
-        {% endfor %}
-
-        {# rendu automatique de tous les champs du formulaire #}
-        {{ form_start(form) }}
-        {{ form_widget(form) }}
-
-        <button class="btn btn-primary mt-3">
-            Enregistrer
-        </button>
-        {{ form_end(form) }}
+        </div>
     </div>
+
+    <script>
+        // Aperçu de l'image en temps réel après sélection
+        const fileInput = document.querySelector('input[type="file"]');
+        const avatarPreview = document.getElementById('avatar-preview');
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        avatarPreview.setAttribute('src', e.target.result);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    </script>
 {% endblock %}

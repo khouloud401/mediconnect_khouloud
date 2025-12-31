@@ -3,44 +3,171 @@
 {% block title %}Inscription Infirmier - MediConnect{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow">
-                    <div class="card-body p-5">
-                        <h2 class="text-center mb-4">Inscription Infirmier</h2>
+    <style>
+        :root {
+            --primary-blue: #007bff;
+            --info-cyan: #17a2b8;
+            --pistachio-green: #93c572;
+            --royal-violet: #6a0dad;
+        }
 
-                        {{ form_start(registrationForm) }}
+        /* Arrière-plan complet avec image7 */
+        body {
+            background: url("{{ asset('images/image7.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-                        <div class="row">
-                            {# On utilise 'nom' et 'prenom' car ils sont définis ainsi dans ton FormType #}
-                            <div class="col-md-6 mb-3">{{ form_row(registrationForm.name) }}</div>
-                            <div class="col-md-6 mb-3">{{ form_row(registrationForm.prenom) }}</div>
-                        </div>
+        /* Formulaire déplacé à GAUCHE */
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* Aligné à gauche */
+            padding-left: 5%; /* Marge par rapport au bord gauche */
+            padding-right: 20px;
+            position: relative;
+        }
 
-                        <div class="mb-3">{{ form_row(registrationForm.email) }}</div>
-                        <div class="mb-3">{{ form_row(registrationForm.phone) }}</div>
+        /* Flèche de retour simple */
+        .back-arrow {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            color: white;
+            font-size: 2.2rem;
+            text-decoration: none;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">{{ form_row(registrationForm.ville) }}</div>
-                        </div>
+        .back-arrow:hover {
+            color: var(--info-cyan);
+            transform: scale(1.1);
+        }
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">{{ form_row(registrationForm.genre) }}</div>
-                            <div class="col-md-6 mb-3">{{ form_row(registrationForm.experience) }}</div>
-                        </div>
+        /* Carte blanche ajustée à gauche */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            padding: 20px 25px;
+            width: 100%;
+            max-width: 550px;
+        }
 
-                        <div class="mb-3">{{ form_row(registrationForm.nomHopital) }}</div>
+        .btn-info-custom {
+            background: linear-gradient(45deg, var(--info-cyan), var(--primary-blue));
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 12px;
+            border-radius: 10px;
+            width: 100%;
+            transition: 0.3s;
+        }
 
-                        {# Password répété : on accède à .first et .second #}
-                        <div class="mb-3">{{ form_row(registrationForm.plainPassword.first) }}</div>
-                        <div class="mb-3">{{ form_row(registrationForm.plainPassword.second) }}</div>
+        .btn-info-custom:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
 
-                        <button type="submit" class="btn btn-success w-100 mt-3">S'inscrire</button>
+        .form-control {
+            border-radius: 8px;
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            font-size: 0.9rem;
+        }
 
-                        {{ form_end(registrationForm) }}
-                    </div>
+        .form-label {
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-bottom: 3px;
+            color: #333;
+        }
+
+        /* Masquer le footer blanc */
+        footer, .footer {
+            display: none !important;
+        }
+    </style>
+
+    <div class="main-content">
+        <a href="{{ path('app_register') }}" class="back-arrow">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+
+        <div class="glass-card">
+            <div class="text-center mb-3">
+                <h2 class="fw-bold m-0" style="color: var(--info-cyan);">Inscription Infirmier</h2>
+                <hr style="width: 40px; border: 2px solid var(--info-cyan); margin: 8px auto;">
+            </div>
+
+            {{ form_start(registrationForm) }}
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    {{ form_label(registrationForm.name, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.name, {'attr': {'class': 'form-control'}}) }}
                 </div>
+                <div class="col-md-6 mb-2">
+                    {{ form_label(registrationForm.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+
+            <div class="mb-2">
+                {{ form_label(registrationForm.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    {{ form_label(registrationForm.phone, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.phone, {'attr': {'class': 'form-control'}}) }}
+                </div>
+                <div class="col-md-6 mb-2">
+                    {{ form_label(registrationForm.ville, 'Ville', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.ville, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    {{ form_label(registrationForm.genre, 'Genre', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.genre, {'attr': {'class': 'form-control'}}) }}
+                </div>
+                <div class="col-md-6 mb-2">
+                    {{ form_label(registrationForm.experience, 'Années d\'expérience', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.experience, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+
+            <div class="mb-2">
+                {{ form_label(registrationForm.nomHopital, 'Nom de l\'Hôpital / Clinique', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.nomHopital, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form_label(registrationForm.plainPassword.first, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form_label(registrationForm.plainPassword.second, 'Confirmation', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-info-custom shadow-sm text-white">S'inscrire comme infirmier</button>
+            {{ form_end(registrationForm) }}
+
+            <div class="text-center mt-2">
+                <p class="mb-0 small">Déjà inscrit ? <a href="{{ path('app_login') }}" style="color: var(--info-cyan); font-weight: bold; text-decoration: none;">Se connecter</a></p>
             </div>
         </div>
     </div>

@@ -1,45 +1,206 @@
 {% extends 'base.html.twig' %}
+
 {% block title %}Accueil - MediConnect{% endblock %}
+
 {% block body %}
-<div class="jumbotron bg-light p-5 rounded-3 mb-4">
-    <h1 class="display-4">Bienvenue sur MediConnect</h1>
-    <p class="lead">Trouvez et réservez un rendez-vous avec les meilleurs médecins près de chez vous</p>
-    <hr class="my-4">
-    <a class="btn btn-primary btn-lg" href="{{ path('patient_search_doctors') }}" role="button">
-        <i class="bi bi-search"></i> Rechercher un médecin
-    </a>
-</div>
+    <style>
+        :root {
+            --sky-blue: #00d4ff;
+            --deep-sky-blue: #0095ff;
+            --pistachio-green: #b2ec5d;
+            --dark-pistachio: #93c47d;
+            --glass-white: rgba(255, 255, 255, 0.88);
+            --glass-blue: rgba(224, 247, 250, 0.9);
+        }
 
-<h2 class="mb-4">Spécialités médicales</h2>
-<div class="row g-3 mb-5">
-    {% for specialty in specialties|slice(0, 6) %}
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ specialty.nom }}</h5>
-                <p class="card-text">{{ specialty.description|slice(0, 100) }}...</p>
+        /* Arrière-plan total de la page */
+        body {
+            background: url("{{ asset('images/photo.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Overlay pour donner un aspect "Soft Focus" au fond */
+        .page-wrapper {
+            background: rgba(0, 0, 0, 0.2); /* Voile léger pour faire ressortir les blocs */
+            min-height: 100vh;
+            padding: 40px 0;
+        }
+
+        /* Hero Banner Bento */
+        .hero-bento {
+            background: var(--glass-white);
+            backdrop-filter: blur(15px);
+            border-radius: 40px;
+            padding: 60px 20px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .hero-title {
+            font-weight: 800;
+            font-size: 3.5rem;
+            background: linear-gradient(90deg, var(--deep-sky-blue), var(--dark-pistachio));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Cartes Spécialités (Style Bulles Bleu Ciel) */
+        .specialty-card {
+            background: var(--glass-blue);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            border: 2px solid white;
+            padding: 25px;
+            height: 100%;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .specialty-card:hover {
+            transform: scale(1.05);
+            background: white;
+            box-shadow: 0 15px 30px rgba(0,212,255,0.2);
+        }
+
+        /* Cartes Médecins (Style Bento Vert Pistache) */
+        .doctor-card {
+            background: var(--glass-white);
+            border-radius: 30px;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: 0.3s ease;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(147, 196, 125, 0.3);
+        }
+
+        .doctor-header {
+            background: linear-gradient(135deg, var(--sky-blue), var(--pistachio-green));
+            height: 100px;
+            position: relative;
+        }
+
+        .doctor-avatar {
+            width: 90px;
+            height: 90px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: -45px auto 10px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-size: 2.5rem;
+            color: var(--deep-sky-blue);
+        }
+
+        /* Boutons Modernes */
+        .btn-sky {
+            background: var(--deep-sky-blue);
+            color: white;
+            border-radius: 15px;
+            padding: 12px 30px;
+            font-weight: 700;
+            border: none;
+            transition: 0.3s;
+        }
+
+        .btn-sky:hover {
+            background: #0076cc;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,149,255,0.3);
+            color: white;
+        }
+
+        .badge-pistachio {
+            background: var(--pistachio-green);
+            color: #38761d;
+            font-weight: 700;
+            padding: 8px 15px;
+        }
+
+        .section-label {
+            color: white;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 40px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        footer { display: none !important; }
+    </style>
+
+    <div class="page-wrapper">
+        <div class="container">
+
+            <div class="hero-bento">
+                <h1 class="hero-title">MediConnect</h1>
+                <p class="lead fw-bold text-muted">L'excellence médicale entre vos mains.</p>
+                <div class="mt-4">
+                    <a class="btn btn-sky btn-lg" href="{{ path('patient_search_doctors') }}">
+                        <i class="bi bi-geo-alt-fill me-2"></i>Trouver un spécialiste
+                    </a>
+                </div>
             </div>
+
+            <h2 class="section-label">Nos Spécialités</h2>
+            <div class="row g-4 mb-5">
+                {% for specialty in specialties|slice(0, 6) %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="specialty-card text-center">
+                            <div class="mb-3">
+                                <i class="bi bi-heart-pulse-fill" style="font-size: 2rem; color: var(--deep-sky-blue);"></i>
+                            </div>
+                            <h4 class="fw-bold" style="color: var(--deep-green);">{{ specialty.nom }}</h4>
+                            <p class="small text-muted mb-0">{{ specialty.description|slice(0, 80) }}...</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <h2 class="section-label">Médecins Recommandés</h2>
+            <div class="row g-4">
+                {% for item in topDoctors %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="doctor-card h-100">
+                            <div class="doctor-header"></div>
+                            <div class="card-body text-center p-4">
+                                <div class="doctor-avatar">
+                                    <i class="bi bi-person-badge"></i>
+                                </div>
+                                <h5 class="fw-bold mt-2">Dr. {{ item.doctor.fullName }}</h5>
+                                <span class="badge badge-pistachio rounded-pill mb-3">{{ item.doctor.specialty.nom }}</span>
+
+                                <div class="d-flex justify-content-center mb-3">
+                                    <span class="text-warning">
+                                        {% for i in 1..5 %}
+                                            <i class="bi bi-star{{ i <= item.doctor.averageRating ? '-fill' : '' }}"></i>
+                                        {% endfor %}
+                                    </span>
+                                </div>
+
+                                <p class="text-muted small">
+                                    <i class="bi bi-geo-alt-fill text-info me-1"></i> {{ item.doctor.ville }}
+                                </p>
+
+                                <a href="{{ path('patient_doctor_profile', {id: item.doctor.id}) }}" class="btn btn-sky w-100 mt-2">
+                                    Prendre rendez-vous
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
         </div>
     </div>
-    {% endfor %}
-</div>
-
-<h2 class="mb-4">Médecins les mieux notés</h2>
-<div class="row g-3">
-    {% for doctor in topDoctors %}
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Dr. {{ doctor.fullName }}</h5>
-                <p class="card-text">
-                    <strong>{{ doctor.specialty.nom }}</strong><br>
-                    <i class="bi bi-geo-alt"></i> {{ doctor.ville }}<br>
-                    <i class="bi bi-star-fill text-warning"></i> {{ doctor.averageRating }}/5
-                </p>
-                <a href="{{ path('patient_doctor_profile', {id: doctor.id}) }}" class="btn btn-sm btn-outline-primary">Voir le profil</a>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
 {% endblock %}
