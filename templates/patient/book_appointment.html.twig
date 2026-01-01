@@ -26,7 +26,6 @@
             background: radial-gradient(circle at top right, rgba(79, 172, 254, 0.1), transparent);
         }
 
-        /* Section de titre (Header) */
         .welcome-section {
             margin-bottom: 30px;
             color: white;
@@ -56,7 +55,6 @@
             margin: 0;
         }
 
-        /* Carte de formulaire Bento */
         .bento-card {
             background: var(--glass-white);
             backdrop-filter: blur(15px);
@@ -85,15 +83,33 @@
             font-size: 0.9rem;
         }
 
+        /* Input Group Customization */
+        .input-group-text {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-right: none;
+            border-radius: 15px 0 0 15px;
+            color: var(--accent-color);
+        }
+
         .form-control {
             border-radius: 15px;
             padding: 12px 18px;
             border: 1px solid #e0e0e0;
-            margin-bottom: 20px;
+            margin-bottom: 0; /* Géré par mb-3 sur le parent */
             background: white;
         }
 
-        /* Bouton moderne */
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(79, 172, 254, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        .input-group .form-control {
+            border-radius: 0 15px 15px 0;
+            border-left: none;
+        }
+
         .btn-modern-footer {
             background: var(--accent-color);
             color: white;
@@ -107,6 +123,7 @@
             box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
             transition: 0.3s;
             margin-top: 10px;
+            cursor: pointer;
         }
 
         .btn-modern-footer:hover {
@@ -115,7 +132,6 @@
             color: white;
         }
 
-        /* Flèche retour */
         .back-arrow {
             position: fixed;
             top: 25px;
@@ -124,12 +140,6 @@
             font-size: 2rem;
             z-index: 1000;
             text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            transition: 0.3s;
-        }
-
-        .back-arrow:hover {
-            color: var(--accent-color);
-            transform: scale(1.1);
         }
 
         footer { display: none !important; }
@@ -162,21 +172,31 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 {{ form_label(form.dateTime, "Choisir la date et l'heure", {'label_attr': {'class': 'form-label'}}) }}
-                                {{ form_widget(form.dateTime, {'attr': {'class': 'form-control'}}) }}
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-calendar3"></i>
+                                    </span>
+                                    {{ form_widget(form.dateTime, {'attr': {'class': 'form-control'}}) }}
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Médecin sélectionné</label>
-                                <input type="text" class="form-control" value="Dr. {{ doctor.fullName }}" disabled>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person-check"></i>
+                                    </span>
+                                    <input type="text" class="form-control" value="Dr. {{ doctor.fullName }}" disabled>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-4">
                             {{ form_label(form.motif, "Motif de consultation", {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(form.motif, {'attr': {'class': 'form-control', 'placeholder': 'Expliquez brièvement votre besoin...'}}) }}
+                            {{ form_widget(form.motif, {'attr': {'class': 'form-control', 'placeholder': 'Expliquez brièvement votre besoin...', 'rows': '3'}}) }}
                         </div>
 
-                        <button type="submit" class="btn-modern-footer">
-                            Confirmer la demande de rendez-vous
+                        <button type="submit" class="btn-modern-footer shadow">
+                            <i class="bi bi-check2-circle me-2"></i> Confirmer la demande de rendez-vous
                         </button>
                         {{ form_end(form) }}
                     </div>
@@ -185,4 +205,25 @@
 
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Récupération de l'input date généré par Symfony
+            const dateInput = document.querySelector('input[type="datetime-local"]');
+
+            // Liste des dates "Bleues" (occupées) envoyée par le contrôleur
+            const datesBloquees = {{ datesBloquees|json_encode|raw }};
+
+            if (dateInput) {
+                dateInput.addEventListener('change', function() {
+                    if (datesBloquees.includes(this.value)) {
+                        alert("⚠️ Ce créneau est déjà réservé (Date Bleue). Merci d'en choisir un autre.");
+                        this.value = ''; // On vide le champ
+                    }
+                });
+            }
+        });
+    </script>
 {% endblock %}

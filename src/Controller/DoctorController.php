@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Appointment;
 use App\Entity\Prescription;
+use App\Entity\Patient;
 use App\Entity\Nurse;
 use App\Entity\Task;
 use App\Form\DoctorProfileType;
@@ -191,9 +192,6 @@ class DoctorController extends AbstractController
         return $this->redirectToRoute('doctor_dashboard');
     }
 
-    /**
-     * AJOUT : Fonction pour refuser un rendez-vous (Corrige l'erreur RouteNotFound)
-     */
     #[Route('/appointment/{id}/refuse', name: 'doctor_refuse_appointment')]
     public function refuseAppointment(Appointment $appointment, EntityManagerInterface $entityManager): Response
     {
@@ -205,13 +203,14 @@ class DoctorController extends AbstractController
         $this->addFlash('danger', 'Rendez-vous refusé.');
         return $this->redirectToRoute('doctor_dashboard');
     }
+
     #[Route('/appointment/{id}/complete', name: 'doctor_complete_appointment')]
     public function completeAppointment(Appointment $appointment, EntityManagerInterface $entityManager): Response
     {
         if ($appointment->getDoctor() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
-        $appointment->setStatus('completed'); // Change le statut en 'completed'
+        $appointment->setStatus('completed');
         $entityManager->flush();
 
         $this->addFlash('success', 'La consultation est terminée.');
@@ -219,44 +218,65 @@ class DoctorController extends AbstractController
         return $this->redirectToRoute('doctor_appointments');
     }
 
-    #[Route('/prescriptions/{appointmentId?}', name: 'doctor_prescriptions')]
+    // --- PARTIE CORRIGÉE : PRESCRIPTIONS ---
+    #[Route('/prescriptions/patient/{patientId?}/appointment/{appointmentId?}', name: 'doctor_prescriptions')]
     public function prescriptions(
+        ?int $patientId = null,
         ?int $appointmentId = null,
         EntityManagerInterface $entityManager,
         Request $request
     ): Response {
         $doctor = $this->getUser();
         $form = null;
+        $patient = null;
 
+        // 1. Gestion de la création si on a un rendez-vous
         if ($appointmentId) {
             $appointment = $entityManager->getRepository(Appointment::class)->find($appointmentId);
             if (!$appointment || $appointment->getDoctor() !== $doctor) {
                 throw $this->createAccessDeniedException();
             }
+            $patient = $appointment->getPatient();
+
             $prescription = new Prescription();
             $prescription->setAppointment($appointment);
+            $prescription->setContent("Ordonnance pour " . $patient->getFullName());
+
             $form = $this->createForm(PrescriptionType::class, $prescription);
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
                 $entityManager->persist($prescription);
                 $entityManager->flush();
-                return $this->redirectToRoute('doctor_prescriptions');
+                $this->addFlash('success', 'L\'ordonnance a été enregistrée.');
+                return $this->redirectToRoute('doctor_prescriptions', ['patientId' => $patient->getId()]);
             }
         }
+        // 2. Gestion de l'affichage seul si on vient de la liste des patients
+        elseif ($patientId) {
+            $patient = $entityManager->getRepository(Patient::class)->find($patientId);
+        }
 
-        $prescriptions = $entityManager->getRepository(Prescription::class)
+        // 3. Récupération de l'historique filtré par Patient ET par Docteur
+        $queryBuilder = $entityManager->getRepository(Prescription::class)
             ->createQueryBuilder('p')
             ->join('p.appointment', 'a')
             ->where('a.doctor = :doctor')
-            ->setParameter('doctor', $doctor)
-            ->orderBy('p.createdAt', 'DESC')
+            ->setParameter('doctor', $doctor);
+
+        if ($patientId) {
+            $queryBuilder->andWhere('a.patient = :patientId')
+                ->setParameter('patientId', $patientId);
+        }
+
+        $prescriptionsList = $queryBuilder->orderBy('p.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
 
         return $this->render('doctor/prescriptions.html.twig', [
             'form' => $form ? $form->createView() : null,
-            'prescriptions' => $prescriptions,
+            'prescriptions' => $prescriptionsList,
+            'patient' => $patient, // Variable nécessaire pour le fullName dans le template
         ]);
     }
 

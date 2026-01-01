@@ -175,8 +175,7 @@
                                                     Terminer le RDV
                                                 </a>
                                             {% elseif appointment.status == 'completed' %}
-                                                <a href="{{ path('doctor_prescriptions', {'appointmentId': appointment.id}) }}" class="btn btn-sm btn-outline-pistachio btn-action border-2" style="border: 1px solid var(--pistachio-green); color: var(--deep-green);">
-                                                    <i class="bi bi-file-earmark-medical me-1"></i> Ordonnance
+                                                <a href="{{ path('doctor_prescriptions', {'patientId': appointment.patient.id, 'appointmentId': appointment.id}) }}" class="btn btn-sm btn-outline-pistachio btn-action border-2" style="border: 1px solid var(--pistachio-green); color: var(--deep-green);">                                                    <i class="bi bi-file-earmark-medical me-1"></i> Ordonnance
                                                 </a>
                                             {% endif %}
                                         </div>

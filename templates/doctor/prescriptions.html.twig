@@ -1,54 +1,213 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes Prescriptions - MediConnect{% endblock %}
+{% block title %}Rédiger une Ordonnance - Dr. {{ app.user.fullName }}{% endblock %}
 
 {% block body %}
-    <h1><i class="bi bi-file-medical"></i> Mes Prescriptions</h1>
+    <style>
+        :root {
+            --accent-color: #4facfe;
+            --glass-white: rgba(255, 255, 255, 0.9);
+            --text-dark: #1e293b;
+        }
 
-    <div class="row mt-4">
-        <!-- Create Prescription Form -->
-        {% if form is not null %}
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            Rédiger une ordonnance pour {{ form.vars.data.appointment.patient.fullName }}
-                        </h5>
-                        {{ form_start(form) }}
-                        {{ form_row(form.content) }}
-                        {{ form_row(form.medications) }}
-                        {{ form_row(form.instructions) }}
-                        <button class="btn btn-primary mt-2">Créer l'ordonnance</button>
-                        {{ form_end(form) }}
-                    </div>
+        body {
+            background: url("{{ asset('images/image10.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+        }
+
+        .dashboard-wrapper {
+            padding: 40px 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top right, rgba(79, 172, 254, 0.1), transparent);
+        }
+
+        .welcome-section {
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--glass-white);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .welcome-section h1 {
+            font-weight: 800;
+            font-size: 2.2rem;
+            margin: 0;
+        }
+
+        .bento-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .card-label {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(79, 172, 254, 0.15);
+            color: var(--accent-color);
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            border-radius: 15px;
+            padding: 12px 18px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+            background: white;
+        }
+
+        .btn-modern-footer {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 16px;
+            width: 100%;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .btn-modern-footer:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        .back-arrow {
+            position: fixed; top: 25px; left: 25px; color: white; font-size: 2rem;
+            z-index: 1000; text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .history-item {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        footer { display: none !important; }
+    </style>
+
+    <a href="{{ path('doctor_patients') }}" class="back-arrow">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+
+    <div class="dashboard-wrapper">
+        <div class="container">
+
+            <div class="welcome-section">
+                <div class="profile-avatar shadow-lg">
+                    <i class="bi bi-file-earmark-medical"></i>
+                </div>
+                <div>
+                    <h1>Ordonnance</h1>
+                    <p class="fs-5 m-0 opacity-75">Rédaction simplifiée pour {{ patient.fullName }}</p>
                 </div>
             </div>
-        {% endif %}
 
-        <!-- List Prescriptions -->
-        <div class="{% if form is not null %}col-md-6{% else %}col-md-12{% endif %}">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Mes ordonnances</h5>
-                    {% if prescriptions is not empty %}
-                        <ul class="list-group">
-                            {% for prescription in prescriptions %}
-                                <li class="list-group-item">
-                                    <strong>Patient:</strong> {{ prescription.appointment.patient.fullName }}<br>
-                                    <strong>Date:</strong> {{ prescription.createdAt|date('d/m/Y H:i') }}<br>
-                                    <strong>Contenu:</strong> {{ prescription.content }}<br>
-                                    {% if prescription.medications %}
-                                        <strong>Médicaments:</strong> {{ prescription.medications }}<br>
-                                    {% endif %}
-                                    {% if prescription.instructions %}
-                                        <strong>Instructions:</strong> {{ prescription.instructions }}
-                                    {% endif %}
-                                </li>
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+
+                    {# 1. LE FORMULAIRE #}
+                    <div class="bento-card">
+                        {% if form is defined and form is not null %}
+                            <span class="card-label">Nouvelle Prescription</span>
+                            <h4 class="fw-bold mb-4">Rédiger pour le patient</h4>
+
+                            {{ form_start(form) }}
+                            <div class="mb-3">
+                                {{ form_label(form.medications, "Liste des Médicaments", {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.medications, {'attr': {'class': 'form-control', 'placeholder': 'Doliprane 1g, Amoxicilline 500mg...'}}) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(form.instructions, "Instructions & Posologie", {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.instructions, {'attr': {'class': 'form-control', 'placeholder': 'Fréquence, durée du traitement...'}}) }}
+                            </div>
+
+                            {# AJOUT DU CHAMP CONTENU ICI #}
+                            <div class="mb-4">
+                                {{ form_label(form.content, "Contenu de l'ordonnance", {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.content, {'attr': {'class': 'form-control', 'placeholder': 'Détails supplémentaires ou titre de l\'ordonnance...'}}) }}
+                            </div>
+
+                            <button type="submit" class="btn-modern-footer">
+                                <i class="bi bi-save me-2"></i> Enregistrer l'ordonnance
+                            </button>
+                            {{ form_end(form) }}
+                        {% endif %}
+                    </div>
+
+                    {# 2. L'HISTORIQUE #}
+                    <h3 class="text-white mb-4"><i class="bi bi-clock-history me-2"></i>Dernières ordonnances</h3>
+                    <div class="bento-card">
+                        {% if prescriptions is empty %}
+                            <p class="text-muted text-center m-0">Aucun historique pour ce patient.</p>
+                        {% else %}
+                            {% for p in prescriptions %}
+                                <div class="history-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge bg-light text-primary border">Le {{ p.createdAt|date('d/m/Y') }}</span>
+                                        <small class="text-muted">ID #{{ p.id }}</small>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <strong style="font-size: 0.8rem;" class="text-uppercase text-muted">Médicaments :</strong>
+                                            <p class="m-0">{{ p.medications }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong style="font-size: 0.8rem;" class="text-uppercase text-muted">Instructions :</strong>
+                                            <p class="m-0 text-secondary">{{ p.instructions }}</p>
+                                        </div>
+                                        <div class="col-md-4 border-start">
+                                            <strong style="font-size: 0.8rem;" class="text-uppercase text-muted">Contenu :</strong>
+                                            <p class="m-0 small">{{ p.content }}</p>
+                                        </div>
+                                    </div>
+                                </div>
                             {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-muted">Vous n'avez aucune ordonnance pour le moment.</p>
-                    {% endif %}
+                        {% endif %}
+                    </div>
+
                 </div>
             </div>
         </div>

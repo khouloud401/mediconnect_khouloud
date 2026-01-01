@@ -139,9 +139,9 @@
                                         <div class="small text-muted"><i class="bi bi-telephone me-2"></i>{{ patient.phone ?? '-' }}</div>
                                     </td>
                                     <td class="text-center">
-                                        {# Bouton Créer Ordonnance #}
-                                        <a href="{{ path('doctor_prescriptions', {'patientId': patient.id}) }}" class="btn-prescription">
-                                            <i class="bi bi-file-earmark-medical"></i>  Ordonnance
+                                        {# MODIFICATION ICI : On passe patientId pour filtrer les ordonnances de ce patient précis #}
+                                        <a href="{{ path('doctor_prescriptions', { 'patientId': patient.id}) }}" class="btn-prescription">
+                                            <i class="bi bi-file-earmark-medical"></i>  Ordonnances
                                         </a>
                                     </td>
                                 </tr>

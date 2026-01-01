@@ -83,27 +83,50 @@ class PatientController extends AbstractController
     public function bookAppointment(
         Doctor $doctor,
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        AppointmentRepository $appointmentRepository
     ): Response {
         $appointment = new Appointment();
         $appointment->setDoctor($doctor);
         $appointment->setPatient($this->getUser());
 
+        // --- LOGIQUE DES DATES BLEUES (OCCUPÉES) ---
+        // On récupère les rendez-vous déjà "Acceptés" pour ce docteur
+        $appointmentsOccupes = $appointmentRepository->findBy([
+            'doctor' => $doctor,
+            'status' => 'accepted'
+        ]);
+
+        $datesBloquees = [];
+        foreach ($appointmentsOccupes as $app) {
+            if ($app->getDateTime()) {
+                // Formatage compatible avec l'input datetime-local (YYYY-MM-DDTHH:mm)
+                $datesBloquees[] = $app->getDateTime()->format('Y-m-d\TH:i');
+            }
+        }
+
         $form = $this->createForm(AppointmentType::class, $appointment);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Vérification de sécurité finale pour éviter les doublons
+            $dateChoisie = $appointment->getDateTime()->format('Y-m-d\TH:i');
+            if (in_array($dateChoisie, $datesBloquees)) {
+                $this->addFlash('danger', 'Désolé, ce créneau vient d\'être réservé (Bleu). Veuillez en choisir un autre.');
+                return $this->redirectToRoute('patient_book_appointment', ['id' => $doctor->getId()]);
+            }
+
             $entityManager->persist($appointment);
             $entityManager->flush();
 
             $this->addFlash('success', 'Votre demande de rendez-vous a été envoyée avec succès !');
-
             return $this->redirectToRoute('patient_appointments');
         }
 
         return $this->render('patient/book_appointment.html.twig', [
             'form'   => $form->createView(),
             'doctor' => $doctor,
+            'datesBloquees' => $datesBloquees, // Envoi au Twig pour le JavaScript
         ]);
     }
 
@@ -195,7 +218,6 @@ class PatientController extends AbstractController
 
         if ($appointment->getStatus() !== 'completed') {
             $this->addFlash('error', 'Vous ne pouvez laisser un avis que pour un rendez-vous terminé.');
-
             return $this->redirectToRoute('patient_appointments');
         }
 
@@ -211,7 +233,6 @@ class PatientController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Votre avis a été ajouté avec succès !');
-
             return $this->redirectToRoute('patient_appointments');
         }
 
@@ -239,7 +260,6 @@ class PatientController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Votre avis a été ajouté avec succès !');
-
             return $this->redirectToRoute('patient_reviews');
         }
 
@@ -252,9 +272,7 @@ class PatientController extends AbstractController
     #[Route('/prescription/{id}/download', name: 'patient_download_prescription')]
     public function downloadPrescription(int $id): Response
     {
-        // TODO: Implémenter le téléchargement PDF
         $this->addFlash('info', 'Fonctionnalité de téléchargement en cours de développement.');
-
         return $this->redirectToRoute('patient_appointments');
     }
 }

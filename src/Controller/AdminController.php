@@ -63,7 +63,7 @@ class AdminController extends AbstractController
 
     #[Route('/nurses/delete/{id}', name: 'admin_nurse_delete', methods: ['POST'])]
     public function deleteNurse(Nurse $nurse): Response {
-        $nom = $nurse->getNom();
+        $nom = $nurse->getName();
         $this->em->remove($nurse);
         $this->em->flush();
         $this->addLog("Suppression de l'infirmier : " . $nom);

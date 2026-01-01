@@ -27,7 +27,6 @@
             background: rgba(0, 0, 0, 0.15);
         }
 
-        /* Flèche Retour */
         .back-arrow {
             position: fixed;
             top: 25px;
@@ -44,7 +43,6 @@
             transform: scale(1.1);
         }
 
-        /* Bento Cards */
         .bento-card {
             background: var(--glass-white);
             backdrop-filter: blur(15px);
@@ -65,7 +63,6 @@
             margin-bottom: 30px;
         }
 
-        /* Stats */
         .stat-badge {
             background: var(--pistachio-green);
             color: white;
@@ -75,7 +72,6 @@
             box-shadow: 0 5px 15px rgba(147, 196, 125, 0.3);
         }
 
-        /* Table Design */
         .table { --bs-table-bg: transparent; vertical-align: middle; }
         .table thead th {
             color: var(--deep-green);
@@ -87,7 +83,6 @@
 
         .nurse-row:hover { background: rgba(147, 196, 125, 0.05); }
 
-        /* Badges Shifts */
         .badge-shift {
             padding: 8px 15px;
             border-radius: 50px;
@@ -120,6 +115,12 @@
             font-weight: 600;
         }
 
+        /* Correction pour que la modale soit bien visible */
+        .modal-content {
+            background-color: white !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
         footer { display: none !important; }
     </style>
 
@@ -134,7 +135,6 @@
                 <h1 class="m-0"><i class="fas fa-user-nurse me-2"></i>Gestion des Infirmiers</h1>
             </div>
 
-            {# Messages Flash #}
             {% for label, messages in app.flashes %}
                 {% for message in messages %}
                     <div class="alert alert-{{ label == 'danger' ? 'danger' : 'success' }} alert-dismissible fade show rounded-pill shadow-sm border-0 mb-4">
@@ -144,7 +144,6 @@
                 {% endfor %}
             {% endfor %}
 
-            {# Header Bento #}
             <div class="bento-card">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div class="stat-badge text-center">
@@ -157,7 +156,6 @@
                 </div>
             </div>
 
-            {# Table Bento #}
             <div class="bento-card">
                 {% if nurses|length > 0 %}
                     <div class="table-responsive">
@@ -198,35 +196,6 @@
                                         </form>
                                     </td>
                                 </tr>
-
-                                {# MODALE DE TÂCHE (Verte) #}
-                                <div class="modal fade" id="taskModal{{ nurse.id }}" tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content rounded-4 border-0">
-                                            <form action="{{ path('doctor_assign_task', {id: nurse.id}) }}" method="POST">
-                                                <div class="modal-header border-0 bg-success text-white rounded-top-4">
-                                                    <h5 class="modal-title fw-bold">Nouvelle tâche : {{ nurse.name }}</h5>
-                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body p-4">
-                                                    <div class="mb-3">
-                                                        <label class="form-label fw-bold">Nom du Patient</label>
-                                                        <input type="text" name="patientName" class="form-control rounded-3" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label fw-bold">Description du soin</label>
-                                                        <textarea name="description" class="form-control rounded-3" rows="4" required placeholder="Décrivez le soin à effectuer..."></textarea>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer border-0">
-                                                    <input type="hidden" name="_token" value="{{ csrf_token('assign_task' ~ nurse.id) }}">
-                                                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Annuler</button>
-                                                    <button type="submit" class="btn btn-success rounded-pill px-4">Envoyer l'ordre</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
                             {% endfor %}
                             </tbody>
                         </table>
@@ -242,9 +211,39 @@
         </div>
     </div>
 
-    {# MODALE RECHERCHE (Verte) #}
-    <div class="modal fade" id="searchNurseModal" tabindex="-1">
-        <div class="modal-dialog">
+    {# --- SECTION DES MODALES (SORTIES DE LA TABLE) --- #}
+    {% for nurse in nurses %}
+        <div class="modal fade" id="taskModal{{ nurse.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4 border-0">
+                    <form action="{{ path('doctor_assign_task', {id: nurse.id}) }}" method="POST">
+                        <div class="modal-header border-0 bg-success text-white rounded-top-4">
+                            <h5 class="modal-title fw-bold">Nouvelle tâche : {{ nurse.name }}</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Nom du Patient</label>
+                                <input type="text" name="patientName" class="form-control rounded-3 shadow-sm" required placeholder="Entrez le nom du patient">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Description du soin</label>
+                                <textarea name="description" class="form-control rounded-3 shadow-sm" rows="4" required placeholder="Décrivez le soin à effectuer..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <input type="hidden" name="_token" value="{{ csrf_token('assign_task' ~ nurse.id) }}">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-success rounded-pill px-4 shadow">Envoyer l'ordre</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="modal fade" id="searchNurseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 border-0">
                 <form action="{{ path('doctor_add_existing_nurse') }}" method="POST">
                     <div class="modal-header border-0 bg-primary text-white rounded-top-4" style="background-color: var(--deep-green) !important;">
@@ -254,14 +253,14 @@
                     <div class="modal-body p-4">
                         <p class="small text-muted mb-4">L'infirmier doit déjà posséder un compte sur la plateforme.</p>
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Email de l'infirmier</label>
-                            <input type="email" name="email" class="form-control rounded-3" placeholder="exemple@email.com" required>
+                            <label class="form-label fw-bold text-dark">Email de l'infirmier</label>
+                            <input type="email" name="email" class="form-control rounded-3 shadow-sm" placeholder="exemple@email.com" required>
                         </div>
                     </div>
                     <div class="modal-footer border-0">
                         <input type="hidden" name="_token" value="{{ csrf_token('add_nurse') }}">
                         <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-success rounded-pill px-4" style="background-color: var(--pistachio-green); border:none;">Ajouter</button>
+                        <button type="submit" class="btn btn-success rounded-pill px-4 shadow" style="background-color: var(--pistachio-green); border:none;">Ajouter</button>
                     </div>
                 </form>
             </div>

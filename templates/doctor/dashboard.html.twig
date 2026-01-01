@@ -101,7 +101,6 @@
         <div class="container">
             <h1 class="welcome-title">Bienvenue, Docteur</h1>
 
-            {# Statistiques en haut #}
             <div class="row g-4">
                 <div class="col-md-3">
                     <div class="stat-card">
@@ -130,7 +129,6 @@
             </div>
 
             <div class="row mt-5 g-4">
-                {# Section Rendez-vous #}
                 <div class="col-lg-7">
                     <div class="bento-card">
                         <h4 class="fw-bold mb-4" style="color: var(--deep-green);">
@@ -142,7 +140,10 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="fw-bold mb-1">{{ appointment.patient.fullName }}</h6>
-                                        <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ appointment.dateTime|date('d/m/Y à H:i') }}</small>
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock me-1"></i>
+                                            {{ appointment.dateTime|date('d/m/Y à H:i') }}
+                                        </small>
                                     </div>
                                     <div class="d-flex gap-2">
                                         <a href="{{ path('doctor_accept_appointment', {id: appointment.id}) }}" class="btn btn-sm btn-success rounded-pill px-3">Accepter</a>
@@ -150,7 +151,13 @@
                                     </div>
                                 </div>
                                 <div class="mt-2 text-end">
-                                    <a href="{{ path('doctor_prescriptions', {'appointmentId': appointment.id}) }}" class="btn btn-sm btn-outline-warning rounded-pill">Rédiger ordonnance</a>
+                                    <a href="{{ path('doctor_prescriptions', {
+                                        patientId: appointment.patient.id,
+                                        appointmentId: appointment.id
+                                    }) }}"
+                                       class="btn btn-sm btn-outline-warning rounded-pill">
+                                        Rédiger ordonnance
+                                    </a>
                                 </div>
                             </div>
                         {% else %}
@@ -162,7 +169,6 @@
                     </div>
                 </div>
 
-                {# Section Actions Rapides #}
                 <div class="col-lg-5">
                     <div class="bento-card">
                         <h4 class="fw-bold mb-4" style="color: var(--deep-green);">
@@ -178,8 +184,6 @@
                             <a href="{{ path('doctor_patients') }}" class="btn btn-outline-pistachio py-2">
                                 <i class="bi bi-people me-2"></i> Mes patients
                             </a>
-
-                            {# Le bouton Profil occupe maintenant toute la largeur pour un design plus propre #}
                             <a href="{{ path('doctor_profile') }}" class="btn btn-light py-2 border rounded-3 shadow-sm mt-2">
                                 <i class="bi bi-person-circle me-2"></i>Mon profil
                             </a>
